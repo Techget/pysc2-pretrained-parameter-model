@@ -62,7 +62,7 @@ action_output = tf.layers.dense(l2_action, 10) # output layer
 l1_user_info = tf.layers.dense(user_info_placeholder, 11, tf.tanh)
 user_info_output = tf.layers.dens(l1_user_info, 5)
 
-# regression
+# regression, NOT SURE IF THIS IS suitable regression
 input_to_regression = tf.concat(concat_dim=1,\
 	values=[minimap_output, screen_output, action_output, user_info_output])
 regression_dense = tf.layers.dense(input_to_regression, 16, tf.nn.relu)
