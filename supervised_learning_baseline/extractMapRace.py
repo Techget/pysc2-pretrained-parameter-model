@@ -1,6 +1,7 @@
 import os
 from os.path import expanduser
 import shutil
+import pickle
 
 map_used = "Odyssey LE"
 race_used = "Terran"
