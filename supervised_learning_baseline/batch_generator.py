@@ -1,6 +1,7 @@
 import os
 from os.path import expanduser
 import numpy as np
+import pickle
 
 class batchGenerator(object):
 	def __init__(self):
@@ -11,7 +12,7 @@ class batchGenerator(object):
 		self.dimension = 64
 
 	# every batch corresponding to 1 replay file
-	def next_batch():
+	def next_batch(self, get_action_id_only=False):
 		full_filename = self.parsed_directory+self.parsed_filenames[self.next_index]
 		self.next_index += 1
 		if self.next_index == len(self.parsed_filenames):
@@ -72,9 +73,8 @@ class batchGenerator(object):
 
 		assert(len(minimap_output) == len(ground_truth_coordinates))
 
-		return minimap_output, screen_output, action_output, player_info_output, ground_truth_coordinates
-
-
-
-
+		if get_action_id_only:
+			return minimap_output, screen_output, player_info_output, action_output
+		else:
+			return minimap_output, screen_output, action_output, player_info_output, ground_truth_coordinates
 
