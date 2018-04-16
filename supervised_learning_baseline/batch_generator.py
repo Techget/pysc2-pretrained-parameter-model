@@ -13,6 +13,10 @@ class batchGenerator(object):
 	# every batch corresponding to 1 replay file
 	def next_batch():
 		full_filename = self.parsed_directory+self.parsed_filenames[self.next_index]
+		self.next_index += 1
+		if self.next_index == len(self.parsed_filenames):
+			self.next_index = 0
+
 		replay_data = pickle.load(open(full_filename, "rb"))
 
 		winner_id = -1
