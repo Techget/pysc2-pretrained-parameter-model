@@ -21,6 +21,7 @@ class batchGenerator(object):
 				winner_id = pi.player_result.player_id
 				break
 
+		assert(winner_id != -1)
 		minimap_output = []
 		screen_output = []
 		action_output = []
@@ -31,6 +32,12 @@ class batchGenerator(object):
 			if state['actions'] == []:
 				continue
 
+			# player info
+			pi_temp = np.array(state['player'])
+			# player_info_output.append(pi_temp)
+			if pi_temp[0] != winner_id:
+				continue
+
 			# minimap
 			m_temp = np.array(state['minimap'])
 			m_temp = np.reshape(m_temp, [self.dimension,self.dimension,5])
@@ -39,9 +46,7 @@ class batchGenerator(object):
 			s_temp = np.array(state['screen'])
 			s_temp = np.reshape(s_temp, [self.dimension,self.dimension,10])
 			# screen_output.append(s_temp)
-			# player info
-			pi_temp = np.array(state['player'])
-			# player_info_output.append(pi_temp)
+			
 
 			# one-hot action_id
 			last_action = None
@@ -63,7 +68,7 @@ class batchGenerator(object):
 
 		assert(len(minimap_output) == len(ground_truth_coordinates))
 
-		return minimap_output, screen_output, action_output. player_info_output. ground_truth_coordinates
+		return minimap_output, screen_output, action_output, player_info_output, ground_truth_coordinates
 
 
 
