@@ -63,8 +63,7 @@ l1_user_info = tf.layers.dense(user_info_placeholder, 11, tf.tanh)
 user_info_output = tf.layers.dense(l1_user_info, 5)
 
 # regression, NOT SURE IF THIS IS suitable regression
-input_to_regression = tf.concat(concat_dim=1,\
-    values=[minimap_output, screen_output, action_output, user_info_output])
+input_to_regression = tf.concat([minimap_output, screen_output, action_output, user_info_output], 1)
 regression_dense = tf.layers.dense(input_to_regression, 16, tf.nn.relu)
 # dropout_regression = tf.layers.dropout(
 #     inputs=dense_screen, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
