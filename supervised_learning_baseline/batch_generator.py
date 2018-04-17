@@ -68,7 +68,7 @@ class batchGenerator(object):
 						continue
 					minimap_output.append(m_temp)
 					screen_output.append(s_temp)
-					action_output.append(one_hot)
+					action_output.append(one_hot[0])
 					player_info_output.append(pi_temp)
 					ground_truth_coordinates.append(np.array(param))
 
