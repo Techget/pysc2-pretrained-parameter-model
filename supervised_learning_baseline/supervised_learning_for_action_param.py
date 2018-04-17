@@ -91,6 +91,7 @@ for step in range(1000):                             # train
         user_info_placeholder:u, 
         X_Y_ouput:y})
     writer.add_summary(result, step)
+    print('step: ', step, 'loss: ',loss_, 'result: ', result)
 
 saver.save(sess, './params', write_meta_graph=False)  # meta_graph is not recommended
 
