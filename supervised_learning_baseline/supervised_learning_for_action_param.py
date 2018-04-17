@@ -27,9 +27,9 @@ conv2_minimap = tf.layers.conv2d(pool1_minimap, 32, 5, 1, 'same', activation=tf.
 pool2_minimap = tf.layers.max_pooling2d(conv2_minimap, 2, 2)    # -> (16, 16, 32)
 flat_minimap = tf.reshape(pool2_minimap, [-1, 16*16*32])          # -> (16*14632, )
 dense_minimap = tf.layers.dense(inputs=flat_minimap, units=1024, activation=tf.nn.leaky_relu)
-dropout_mininmap = tf.layers.dropout(
-    inputs=dense_minimap, rate=0.4, training=True) # change
-minimap_output = tf.layers.dense(dropout_mininmap, 64)
+# dropout_mininmap = tf.layers.dropout(
+#     inputs=dense_minimap, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
+minimap_output = tf.layers.dense(dense_minimap, 64)
 
 # screen
 conv1_screen = tf.layers.conv2d(   
@@ -49,9 +49,9 @@ conv2_screen = tf.layers.conv2d(pool1_screen, 32, 5, 1, 'same', activation=tf.nn
 pool2_screen = tf.layers.max_pooling2d(conv2_screen, 2, 2)    # -> (16, 16, 32)
 flat_screen = tf.reshape(pool2_screen, [-1, 16*16*32])          # -> (16*16*32, )
 dense_screen = tf.layers.dense(inputs=flat_screen, units=1024, activation=tf.nn.relu)
-dropout_screen = tf.layers.dropout(
-    inputs=dense_screen, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
-screen_output = tf.layers.dense(dropout_screen, 64)
+# dropout_screen = tf.layers.dropout(
+#     inputs=dense_screen, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
+screen_output = tf.layers.dense(dense_screen, 64)
 
 # action id
 l1_action = tf.layers.dense(action_placeholder, 128, tf.nn.relu)          # hidden layer
@@ -60,15 +60,15 @@ action_output = tf.layers.dense(l2_action, 10) # output layer
 
 # user info
 l1_user_info = tf.layers.dense(user_info_placeholder, 11, tf.tanh)
-user_info_output = tf.layers.dens(l1_user_info, 5)
+user_info_output = tf.layers.dense(l1_user_info, 5)
 
 # regression, NOT SURE IF THIS IS suitable regression
 input_to_regression = tf.concat(concat_dim=1,\
     values=[minimap_output, screen_output, action_output, user_info_output])
 regression_dense = tf.layers.dense(input_to_regression, 16, tf.nn.relu)
-dropout_regression = tf.layers.dropout(
-    inputs=dense_screen, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
-regression_output = tf.layers.dense(dropout_regression, 2)
+# dropout_regression = tf.layers.dropout(
+#     inputs=dense_screen, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
+regression_output = tf.layers.dense(regression_dense, 2)
 
 # loss
 loss = tf.reduce_mean(tf.square(regression_output - X_Y_ouput))
