@@ -6,8 +6,8 @@ import pickle
 class batchGenerator(object):
 	def __init__(self):
 		self.home_dir = expanduser("~")
-		self.parsed_directory = self.home_dir+'pysc2-replay/data_64/'
-		self.parsed_filenames = os.listdir(parsed_directory)
+		self.parsed_directory = self.home_dir+'/pysc2-replay/data_64/'
+		self.parsed_filenames = os.listdir(self.parsed_directory)
 		self.next_index = 0
 		self.dimension = 64
 
