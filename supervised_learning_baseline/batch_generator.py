@@ -16,6 +16,12 @@ class batchGenerator(object):
 	# every batch corresponding to 1 replay file
 	def next_batch(self, get_action_id_only=False):
 		full_filename = self.parsed_directory+self.parsed_filenames[self.next_index]
+		while os.stat(full_filename).st_size == 0:
+			del self.parsed_filenames[self.next_index]
+			full_filename = self.parsed_directory+self.parsed_filenames[self.next_index]
+			if self.next_index >= len(self.parsed_filenames):
+				self.next_index = 0
+
 		self.next_index += 1
 		if self.next_index == len(self.parsed_filenames):
 			self.next_index = 0
@@ -60,7 +66,7 @@ class batchGenerator(object):
 				if last_action == action:
 					continue
 
-				one_hot = np.zeros((1, 524))
+				one_hot = np.zeros((1, 524)) # shape will be 1*254
 				one_hot[np.arange(1), [action[0]]] = 1
 
 				for param in action[2]:
