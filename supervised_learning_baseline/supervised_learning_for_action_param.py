@@ -71,7 +71,7 @@ regression_output = tf.layers.dense(regression_dense, 2)
 
 # loss
 loss = tf.reduce_mean(tf.square(regression_output - X_Y_ouput))
-training_op = tf.train.GradientDescentOptimizer(0.001).minimize(loss)
+train_op = tf.train.GradientDescentOptimizer(0.001).minimize(loss)
 tf.summary.scalar('loss', loss) # add loss to scalar summary
 
 sess = tf.Session()                                 # control training and others
