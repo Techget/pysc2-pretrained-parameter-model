@@ -2,6 +2,8 @@ import os
 from os.path import expanduser
 import numpy as np
 import pickle
+from google.protobuf.json_format import MessageToJson
+import json
 
 class batchGenerator(object):
 	def __init__(self):
@@ -20,10 +22,13 @@ class batchGenerator(object):
 
 		replay_data = pickle.load(open(full_filename, "rb"))
 
+		loaded_replay_info_json = MessageToJson(replay_data['info'])
+		info_dict = json.loads(loaded_replay_info_json)
+
 		winner_id = -1
-		for pi in replay_data['info'].player_info:
-			if pi.player_result.result == 'Victory':
-				winner_id = pi.player_result.player_id
+		for pi in info_dict['info']['playerInfo']:
+			if pi['playerResult']['result'] == 'Victory':
+				winner_id = int(pi['playerResult']['player_id'])
 				break
 
 		assert(winner_id != -1)
@@ -39,20 +44,16 @@ class batchGenerator(object):
 
 			# player info
 			pi_temp = np.array(state['player'])
-			# player_info_output.append(pi_temp)
 			if pi_temp[0] != winner_id:
 				continue
 
 			# minimap
 			m_temp = np.array(state['minimap'])
 			m_temp = np.reshape(m_temp, [self.dimension,self.dimension,5])
-			# minimap_output.append(m_temp)
 			# screen
 			s_temp = np.array(state['screen'])
 			s_temp = np.reshape(s_temp, [self.dimension,self.dimension,10])
-			# screen_output.append(s_temp)
 			
-
 			# one-hot action_id
 			last_action = None
 			for action in state['actions']:
