@@ -3,11 +3,11 @@ import numpy as np
 from batch_generator import batchGenerator
 
 
-minimap_placeholder = tf.placeholder(tf.int32, [None, 64, 64, 5])
-screen_placeholder = tf.placeholder(tf.int32, [None, 64, 64, 10])
-user_info_placeholder = tf.placeholder(tf.int32, [None, 11])
-action_placeholder = tf.placeholder(tf.int32, [None, 524]) # one hot
-X_Y_ouput = tf.placeholder(tf.int32, [None, 2])
+minimap_placeholder = tf.placeholder(tf.float32, [None, 64, 64, 5])
+screen_placeholder = tf.placeholder(tf.float32, [None, 64, 64, 10])
+user_info_placeholder = tf.placeholder(tf.float32, [None, 11])
+action_placeholder = tf.placeholder(tf.float32, [None, 524]) # one hot
+X_Y_ouput = tf.placeholder(tf.float32, [None, 2])
 
 # minimap
 conv1_minimap = tf.layers.conv2d(   
@@ -16,17 +16,17 @@ conv1_minimap = tf.layers.conv2d(
     kernel_size=5,
     strides=1,
     padding='same',
-    activation=tf.nn.relu
+    activation=tf.nn.leaky_relu
 )           # -> (64, 64, 16)
 pool1_minimap = tf.layers.max_pooling2d(
     conv1_minimap,
     pool_size=2,
     strides=2,
 )           # -> (32, 32, 16)
-conv2_minimap = tf.layers.conv2d(pool1_minimap, 32, 5, 1, 'same', activation=tf.nn.relu)    # -> (32, 32, 32)
+conv2_minimap = tf.layers.conv2d(pool1_minimap, 32, 5, 1, 'same', activation=tf.nn.leaky_relu)    # -> (32, 32, 32)
 pool2_minimap = tf.layers.max_pooling2d(conv2_minimap, 2, 2)    # -> (16, 16, 32)
 flat_minimap = tf.reshape(pool2_minimap, [-1, 16*16*32])          # -> (16*14632, )
-dense_minimap = tf.layers.dense(inputs=flat_minimap, units=1024, activation=tf.nn.relu)
+dense_minimap = tf.layers.dense(inputs=flat_minimap, units=1024, activation=tf.nn.leaky_relu)
 dropout_mininmap = tf.layers.dropout(
     inputs=dense_minimap, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
 minimap_output = tf.layers.dense(dropout_mininmap, 64)
