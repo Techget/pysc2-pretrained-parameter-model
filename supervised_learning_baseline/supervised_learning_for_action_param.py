@@ -28,7 +28,7 @@ pool2_minimap = tf.layers.max_pooling2d(conv2_minimap, 2, 2)    # -> (16, 16, 32
 flat_minimap = tf.reshape(pool2_minimap, [-1, 16*16*32])          # -> (16*14632, )
 dense_minimap = tf.layers.dense(inputs=flat_minimap, units=1024, activation=tf.nn.leaky_relu)
 dropout_mininmap = tf.layers.dropout(
-    inputs=dense_minimap, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
+    inputs=dense_minimap, rate=0.4, training=True)
 minimap_output = tf.layers.dense(dropout_mininmap, 64)
 
 # screen
