@@ -28,7 +28,7 @@ class batchGenerator(object):
 		winner_id = -1
 		for pi in info_dict['playerInfo']:
 			if pi['playerResult']['result'] == 'Victory':
-				winner_id = int(pi['playerResult']['player_id'])
+				winner_id = int(pi['playerResult']['playerId'])
 				break
 
 		assert(winner_id != -1)
