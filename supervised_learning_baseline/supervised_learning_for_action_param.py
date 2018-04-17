@@ -3,11 +3,11 @@ import numpy as np
 from batch_generator import batchGenerator
 
 
-minimap_placeholder = tf.placeholder([-1, 64, 64, 5])
-screen_placeholder = tf.placeholder([-1, 64, 64, 10])
-user_info_placeholder = tf.placeholder([-1, 11])
-action_placeholder = tf.placeholder([-1, 524]) # one hot
-X_Y_ouput = tf.placeholder([-1, 2])
+minimap_placeholder = tf.placeholder(tf.int32, [-1, 64, 64, 5])
+screen_placeholder = tf.placeholder(tf.int32, [-1, 64, 64, 10])
+user_info_placeholder = tf.placeholder(tf.int32, [-1, 11])
+action_placeholder = tf.placeholder(tf.int32, [-1, 524]) # one hot
+X_Y_ouput = tf.placeholder(tf.int32, [-1, 2])
 
 # minimap
 conv1_minimap = tf.layers.conv2d(   
@@ -28,7 +28,7 @@ pool2_minimap = tf.layers.max_pooling2d(conv2_minimap, 2, 2)    # -> (16, 16, 32
 flat_minimap = tf.reshape(pool2_minimap, [-1, 16*16*32])          # -> (16*14632, )
 dense_minimap = tf.layers.dense(inputs=flat_minimap, units=1024, activation=tf.nn.relu)
 dropout_mininmap = tf.layers.dropout(
-	inputs=dense_minimap, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
+    inputs=dense_minimap, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
 minimap_output = tf.layers.dense(dropout_mininmap, 64)
 
 # screen
@@ -50,7 +50,7 @@ pool2_screen = tf.layers.max_pooling2d(conv2_screen, 2, 2)    # -> (16, 16, 32)
 flat_screen = tf.reshape(pool2_screen, [-1, 16*16*32])          # -> (16*16*32, )
 dense_screen = tf.layers.dense(inputs=flat_screen, units=1024, activation=tf.nn.relu)
 dropout_screen = tf.layers.dropout(
-	inputs=dense_screen, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
+    inputs=dense_screen, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
 screen_output = tf.layers.dense(dropout_screen, 64)
 
 # action id
@@ -64,10 +64,10 @@ user_info_output = tf.layers.dens(l1_user_info, 5)
 
 # regression, NOT SURE IF THIS IS suitable regression
 input_to_regression = tf.concat(concat_dim=1,\
-	values=[minimap_output, screen_output, action_output, user_info_output])
+    values=[minimap_output, screen_output, action_output, user_info_output])
 regression_dense = tf.layers.dense(input_to_regression, 16, tf.nn.relu)
 dropout_regression = tf.layers.dropout(
-	inputs=dense_screen, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
+    inputs=dense_screen, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
 regression_output = tf.layers.dense(dropout_regression, 2)
 
 # loss
@@ -84,13 +84,13 @@ merge_op = tf.summary.merge_all() # operation to merge all summary
 
 bg = batchGenerator()
 for step in range(1000):                             # train
-	m,s,a,u,y =  bg.next_batch()
+    m,s,a,u,y =  bg.next_batch()
     _, loss_, result = sess.run([train_op, loss, merge_op],
-    	{minimap_placeholder: m, 
-    	screen_placeholder: s, 
-    	action_placeholder: a, 
-    	user_info_placeholder:u, 
-    	X_Y_ouput:y})
+        {minimap_placeholder: m, 
+        screen_placeholder: s, 
+        action_placeholder: a, 
+        user_info_placeholder:u, 
+        X_Y_ouput:y})
     writer.add_summary(result, step)
 
 saver.save(sess, './params', write_meta_graph=False)  # meta_graph is not recommended

@@ -3,10 +3,10 @@ import numpy as np
 from batch_generator import batchGenerator
 
 
-minimap_placeholder = tf.placeholder([-1, 64, 64, 5])
-screen_placeholder = tf.placeholder([-1, 64, 64, 10])
-user_info_placeholder = tf.placeholder([-1, 11])
-action_output = tf.placeholder([-1, 524]) # one hot
+minimap_placeholder = tf.placeholder(tf.int32, [-1, 64, 64, 5])
+screen_placeholder = tf.placeholder(tf.int32, [-1, 64, 64, 10])
+user_info_placeholder = tf.placeholder(tf.int32, [-1, 11])
+action_output = tf.placeholder(tf.int32, [-1, 524]) # one hot
 # X_Y_ouput = tf.placeholder([-1, 2])
 
 # minimap
