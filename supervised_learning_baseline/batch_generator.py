@@ -26,7 +26,7 @@ class batchGenerator(object):
 		info_dict = json.loads(loaded_replay_info_json)
 
 		winner_id = -1
-		for pi in info_dict['info']['playerInfo']:
+		for pi in info_dict['playerInfo']:
 			if pi['playerResult']['result'] == 'Victory':
 				winner_id = int(pi['playerResult']['player_id'])
 				break
