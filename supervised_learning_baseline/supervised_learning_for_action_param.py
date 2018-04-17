@@ -85,7 +85,7 @@ merge_op = tf.summary.merge_all() # operation to merge all summary
 bg = batchGenerator()
 for step in range(1000):                             # train
 	m,s,a,u,y =  bg.next_batch()
-    _, loss_, result = sess.run([train_op, loss, merge_op],\
+    _, loss_, result = sess.run([train_op, loss, merge_op],
     	{minimap_placeholder: m, 
     	screen_placeholder: s, 
     	action_placeholder: a, 
