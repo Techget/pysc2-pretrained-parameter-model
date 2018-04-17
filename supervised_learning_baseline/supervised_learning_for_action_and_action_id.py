@@ -28,7 +28,7 @@ pool2_minimap = tf.layers.max_pooling2d(conv2_minimap, 2, 2)    # -> (16, 16, 32
 flat_minimap = tf.reshape(pool2_minimap, [-1, 16*16*32])          # -> (16*14632, )
 dense_minimap = tf.layers.dense(inputs=flat_minimap, units=1024, activation=tf.nn.relu)
 dropout_mininmap = tf.layers.dropout(
-	inputs=dense_minimap, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
+    inputs=dense_minimap, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
 minimap_output = tf.layers.dense(dropout_mininmap, 256)
 
 # screen
@@ -50,7 +50,7 @@ pool2_screen = tf.layers.max_pooling2d(conv2_screen, 2, 2)    # -> (16, 16, 32)
 flat_screen = tf.reshape(pool2_screen, [-1, 16*16*32])          # -> (16*16*32, )
 dense_screen = tf.layers.dense(inputs=flat_screen, units=1024, activation=tf.nn.relu)
 dropout_screen = tf.layers.dropout(
-	inputs=dense_screen, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
+    inputs=dense_screen, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
 screen_output = tf.layers.dense(dropout_screen, 256)
 
 # user info
@@ -59,7 +59,7 @@ user_info_output = tf.layers.dens(l1_user_info, 5)
 
 # regression, NOT SURE IF THIS IS suitable regression
 input_to_classification = tf.concat(concat_dim=1,\
-	values=[minimap_output, screen_output, user_info_output])
+    values=[minimap_output, screen_output, user_info_output])
 
 l2_classification = tf.layers.dense(input_to_classification, 1024, tf.nn.relu)
 classification_output = tf.layers.dense(l2_classification, 524)              # output layer
@@ -80,11 +80,11 @@ merge_op = tf.summary.merge_all() # operation to merge all summary
 
 bg = batchGenerator()
 for step in range(1000):                             # train
-	m,s,u,a =  bg.next_batch(get_action_id_only=True)
+    m,s,u,a =  bg.next_batch(get_action_id_only=True)
     _, loss_, result = sess.run([train_op, loss, merge_op],
-    	{minimap_placeholder: m, 
-    	screen_placeholder: s, 
-    	user_info_placeholder:u,
+        {minimap_placeholder: m, 
+        screen_placeholder: s, 
+        user_info_placeholder:u,
         action_output: a})
     writer.add_summary(result, step)
 
