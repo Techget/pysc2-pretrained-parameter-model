@@ -27,7 +27,10 @@ class batchGenerator(object):
 		if self.next_index == len(self.parsed_filenames):
 			self.next_index = 0
 
-		replay_data = pickle.load(open(full_filename, "rb"))
+		try:
+			replay_data = pickle.load(open(full_filename, "rb"))
+		except:
+			return self.next_batch(get_action_id_only)
 
 		loaded_replay_info_json = MessageToJson(replay_data['info'])
 		info_dict = json.loads(loaded_replay_info_json)
