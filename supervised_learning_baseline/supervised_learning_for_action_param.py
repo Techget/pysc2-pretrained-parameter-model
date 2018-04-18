@@ -23,10 +23,10 @@ pool1_minimap = tf.layers.max_pooling2d(
     pool_size=2,
     strides=2,
 )           # -> (32, 32, 16)
-conv2_minimap = tf.layers.conv2d(pool1_minimap, 32, 5, 1, 'same', activation=tf.nn.leaky_relu)    # -> (32, 32, 32)
+conv2_minimap = tf.layers.conv2d(pool1_minimap, 32, 5, 1, 'same', activation=tf.nn.relu)    # -> (32, 32, 32)
 pool2_minimap = tf.layers.max_pooling2d(conv2_minimap, 2, 2)    # -> (16, 16, 32)
 flat_minimap = tf.reshape(pool2_minimap, [-1, 16*16*32])          # -> (16*14632, )
-dense_minimap = tf.layers.dense(inputs=flat_minimap, units=1024, activation=tf.nn.leaky_relu)
+dense_minimap = tf.layers.dense(inputs=flat_minimap, units=1024, activation=tf.nn.relu)
 # dropout_mininmap = tf.layers.dropout(
 #     inputs=dense_minimap, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
 minimap_output = tf.layers.dense(dense_minimap, 64)
@@ -38,7 +38,7 @@ conv1_screen = tf.layers.conv2d(
     kernel_size=5,
     strides=1,
     padding='same',
-    activation=tf.nn.relu
+    activation=tf.nn.leaky_relu
 )           # -> (64, 64, 16)
 pool1_screen = tf.layers.max_pooling2d(
     conv1_screen,
@@ -90,8 +90,10 @@ for step in range(1000):                             # train
         action_placeholder: a, 
         user_info_placeholder:u, 
         X_Y_ouput:y})
-    writer.add_summary(result, step)
-    print('step: ', step, 'loss: ',loss_, 'result: ', result)
+
+    if step % 50 == 0:
+        writer.add_summary(result, step)
+        print('step: ', step, 'loss: ',loss_, 'result: ', result)
 
 saver.save(sess, './params', write_meta_graph=False)  # meta_graph is not recommended
 
