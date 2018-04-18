@@ -7,7 +7,13 @@ minimap_placeholder = tf.placeholder(tf.float32, [None, 64, 64, 5])
 screen_placeholder = tf.placeholder(tf.float32, [None, 64, 64, 10])
 user_info_placeholder = tf.placeholder(tf.float32, [None, 11])
 action_placeholder = tf.placeholder(tf.float32, [None, 524]) # one hot
-X_Y_ouput = tf.placeholder(tf.float32, [None, 2])
+
+# 
+arg_screen_replay_ouput = tf.placeholder(tf.float32, [None, 2])
+# arg_screen2_replay_ouput = tf.placeholder(tf.float32, [None, 2])
+# arg_minimap_replay_ouput = tf.placeholder(tf.float32, [None, 2])
+# arg_queued_replay_output = tf.placeholder(tf.float32, [None, 1])
+# arg_control_group_act_replay_output = tf.placeholder(tf.float32, [None, 1])
 
 # minimap
 conv1_minimap = tf.layers.conv2d(   
@@ -62,9 +68,42 @@ action_output = tf.layers.dense(l2_action, 10) # output layer
 l1_user_info = tf.layers.dense(user_info_placeholder, 11, tf.tanh)
 user_info_output = tf.layers.dense(l1_user_info, 5)
 
-# regression, NOT SURE IF THIS IS suitable regression
-input_to_regression = tf.concat([minimap_output, screen_output, action_output, user_info_output], 1)
-regression_dense = tf.layers.dense(input_to_regression, 16, tf.nn.relu)
+# processed concatenated input
+concat_input = tf.concat([minimap_output, screen_output, action_output, user_info_output], 1)
+
+##### arg Types
+# screen 
+# arg_screen_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
+# arg_screen_output = tf.layers.dense(arg_screen_dense, 2)
+# arg_screen_loss = tf.reduce_mean(tf.square(arg_screen_output - X_Y_ouput))
+# train_op = tf.train.GradientDescentOptimizer(0.001).minimize(arg_screen_loss)
+# tf.summary.scalar('loss', loss) # add loss to scalar summary
+
+# minimap 
+
+# screen2
+
+# queued
+
+# control_group_act
+
+# control_group_id
+
+# select_point_act
+
+# select_add
+
+# select_unit_act
+
+# select_unit_id
+
+# select_worker
+
+# build_queue_id
+
+# unload_id
+
+regression_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 # dropout_regression = tf.layers.dropout(
 #     inputs=dense_screen, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
 regression_output = tf.layers.dense(regression_dense, 2)
