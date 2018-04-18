@@ -88,12 +88,14 @@ for step in range(1000):                             # train
     writer.add_summary(result, step)
 
     if step % 50 == 0:
-        accuracy_, _ = sess.run([accuracy, l2_classification],
+        accuracy_ = sess.run([accuracy],
             {minimap_placeholder: m, 
             screen_placeholder: s, 
             user_info_placeholder:u,
             action_output: a})
-    print('Step:', step, '| train loss: %.4f' % loss_, '| test accuracy: %.2f' % accuracy_)
+        print('Step:', step, '| train loss: %.4f' % loss_, '| test accuracy: %.2f' % accuracy_)
+
+    print('~~~~~~~~~')
 
 saver.save(sess, './params', write_meta_graph=False)  # meta_graph is not recommended
 
