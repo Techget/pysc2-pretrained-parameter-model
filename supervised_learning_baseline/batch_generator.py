@@ -80,6 +80,9 @@ class batchGenerator(object):
 
 		assert(len(minimap_output) == len(ground_truth_coordinates))
 
+		if len(minimap_output) == 0:
+			return self.next_batch(get_action_id_only)
+
 		if get_action_id_only:
 			return minimap_output, screen_output, player_info_output, action_output
 		else:
