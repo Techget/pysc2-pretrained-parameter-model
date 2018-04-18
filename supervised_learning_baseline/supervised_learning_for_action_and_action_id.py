@@ -58,7 +58,7 @@ l1_user_info = tf.layers.dense(user_info_placeholder, 11, tf.tanh)
 user_info_output = tf.layers.dense(l1_user_info, 5)
 
 # regression, NOT SURE IF THIS IS suitable regression
-input_to_regression = tf.concat([minimap_output, screen_output, user_info_output], 1)
+input_to_classification = tf.concat([minimap_output, screen_output, user_info_output], 1)
 
 l2_classification = tf.layers.dense(input_to_classification, 1024, tf.nn.relu)
 classification_output = tf.layers.dense(l2_classification, 524)              # output layer
