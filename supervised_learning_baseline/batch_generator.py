@@ -16,7 +16,8 @@ class batchGenerator(object):
 	# every batch corresponding to 1 replay file
 	def next_batch(self, get_action_id_only=False):
 		full_filename = self.parsed_directory+self.parsed_filenames[self.next_index]
-		while os.stat(full_filename).st_size == 0:
+		# while os.stat(full_filename).st_size == 0:
+		while os.path.getsize(full_filename) == 0:
 			del self.parsed_filenames[self.next_index]
 			full_filename = self.parsed_directory+self.parsed_filenames[self.next_index]
 			if self.next_index >= len(self.parsed_filenames):
@@ -37,11 +38,11 @@ class batchGenerator(object):
 				winner_id = int(pi['playerResult']['playerId'])
 				break
 
-		# assert(winner_id != -1)
 		if winner_id == -1:
-			print(info_dict)
+			# 'Tie'
+			replay_data = [] # release memory
 			return self.next_batch(get_action_id_only)
-			
+
 		minimap_output = []
 		screen_output = []
 		action_output = []
