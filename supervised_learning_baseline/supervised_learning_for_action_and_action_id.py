@@ -96,7 +96,7 @@ for step in range(1000):                             # train
             screen_placeholder: s, 
             user_info_placeholder:u,
             action_output: a})
-        print('Step:', step, '| train loss: %.4f' % loss_, '| test accuracy: %.2f' % accuracy_)
+        print('Step:', step, '| train loss: ', loss_, '| test accuracy: ', accuracy_)
 
     print('~~~~~~~~~')
 
