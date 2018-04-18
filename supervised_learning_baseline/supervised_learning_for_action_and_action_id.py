@@ -3,10 +3,10 @@ import numpy as np
 from batch_generator import batchGenerator
 
 
-minimap_placeholder = tf.placeholder(tf.int32, [None, 64, 64, 5])
-screen_placeholder = tf.placeholder(tf.int32, [None, 64, 64, 10])
-user_info_placeholder = tf.placeholder(tf.int32, [None, 11])
-action_output = tf.placeholder(tf.int32, [None, 524]) # one hot
+minimap_placeholder = tf.placeholder(tf.float32, [None, 64, 64, 5])
+screen_placeholder = tf.placeholder(tf.float32, [None, 64, 64, 10])
+user_info_placeholder = tf.placeholder(tf.float32, [None, 11])
+action_output = tf.placeholder(tf.float32, [None, 524]) # one hot
 # X_Y_ouput = tf.placeholder([-1, 2])
 
 # minimap
@@ -16,7 +16,7 @@ conv1_minimap = tf.layers.conv2d(
     kernel_size=5,
     strides=1,
     padding='same',
-    activation=tf.nn.relu
+    activation=tf.nn.leaky_relu
 )           # -> (64, 64, 16)
 pool1_minimap = tf.layers.max_pooling2d(
     conv1_minimap,
@@ -38,7 +38,7 @@ conv1_screen = tf.layers.conv2d(
     kernel_size=5,
     strides=1,
     padding='same',
-    activation=tf.nn.relu
+    activation=tf.nn.leaky_relu
 )           # -> (64, 64, 16)
 pool1_screen = tf.layers.max_pooling2d(
     conv1_screen,
@@ -94,7 +94,7 @@ for step in range(1000):                             # train
             screen_placeholder: s, 
             user_info_placeholder:u,
             action_output: a})
-        print('Step:', step, '| train loss: %.4f' % loss_, '| test accuracy: %.2f' % accuracy_)
+    print('Step:', step, '| train loss: %.4f' % loss_, '| test accuracy: %.2f' % accuracy_)
 
 saver.save(sess, './params', write_meta_graph=False)  # meta_graph is not recommended
 
