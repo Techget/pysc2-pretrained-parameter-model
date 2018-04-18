@@ -55,7 +55,7 @@ screen_output = tf.layers.dense(dense_screen, 256)
 
 # user info
 l1_user_info = tf.layers.dense(user_info_placeholder, 11, tf.tanh)
-user_info_output = tf.layers.dens(l1_user_info, 5)
+user_info_output = tf.layers.dense(l1_user_info, 5)
 
 # regression, NOT SURE IF THIS IS suitable regression
 input_to_classification = tf.concat(concat_dim=1,\
