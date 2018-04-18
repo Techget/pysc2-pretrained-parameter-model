@@ -27,9 +27,9 @@ conv2_minimap = tf.layers.conv2d(pool1_minimap, 32, 5, 1, 'same', activation=tf.
 pool2_minimap = tf.layers.max_pooling2d(conv2_minimap, 2, 2)    # -> (16, 16, 32)
 flat_minimap = tf.reshape(pool2_minimap, [-1, 16*16*32])          # -> (16*14632, )
 dense_minimap = tf.layers.dense(inputs=flat_minimap, units=1024, activation=tf.nn.relu)
-dropout_mininmap = tf.layers.dropout(
-    inputs=dense_minimap, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
-minimap_output = tf.layers.dense(dropout_mininmap, 256)
+# dropout_mininmap = tf.layers.dropout(
+#     inputs=dense_minimap, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
+minimap_output = tf.layers.dense(dense_minimap, 256)
 
 # screen
 conv1_screen = tf.layers.conv2d(   
@@ -49,9 +49,9 @@ conv2_screen = tf.layers.conv2d(pool1_screen, 32, 5, 1, 'same', activation=tf.nn
 pool2_screen = tf.layers.max_pooling2d(conv2_screen, 2, 2)    # -> (16, 16, 32)
 flat_screen = tf.reshape(pool2_screen, [-1, 16*16*32])          # -> (16*16*32, )
 dense_screen = tf.layers.dense(inputs=flat_screen, units=1024, activation=tf.nn.relu)
-dropout_screen = tf.layers.dropout(
-    inputs=dense_screen, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
-screen_output = tf.layers.dense(dropout_screen, 256)
+# dropout_screen = tf.layers.dropout(
+#     inputs=dense_screen, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
+screen_output = tf.layers.dense(dense_screen, 256)
 
 # user info
 l1_user_info = tf.layers.dense(user_info_placeholder, 11, tf.tanh)
