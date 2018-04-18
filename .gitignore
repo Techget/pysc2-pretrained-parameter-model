@@ -1,1 +1,3 @@
 *.pdf
+supervised_learning_baseline/log/*
+supervised_learning_baseline/__pycache__/*
