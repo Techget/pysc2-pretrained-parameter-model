@@ -72,7 +72,7 @@ accuracy = tf.metrics.accuracy(          # return (acc, update_op), and create 2
 
 
 sess = tf.Session()                                 # control training and others
-sess.run(tf.global_variables_initializer())         # initialize var in graph
+sess.run(tf.global_variables_initializer(), tf.local_variables_initializer())    # initialize var in graph
 saver = tf.train.Saver() # define a saver for saving and restoring
 writer = tf.summary.FileWriter('./log', sess.graph)     # write to file
 merge_op = tf.summary.merge_all() # operation to merge all summary
