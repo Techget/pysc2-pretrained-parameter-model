@@ -81,6 +81,8 @@ class batchGenerator(object):
 		assert(len(minimap_output) == len(ground_truth_coordinates))
 
 		if len(minimap_output) == 0:
+			# The replay file only record one person's operation, so if it is 
+			# the defeated person, we need to skip the replay file
 			return self.next_batch(get_action_id_only)
 
 		if get_action_id_only:
