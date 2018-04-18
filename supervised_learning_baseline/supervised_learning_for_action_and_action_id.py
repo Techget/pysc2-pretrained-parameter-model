@@ -88,7 +88,7 @@ for step in range(1000):                             # train
     writer.add_summary(result, step)
 
     if step % 50 == 0:
-        accuracy_ = sess.run([accuracy],
+        accuracy_, _ = sess.run([accuracy, l2_classification],
             {minimap_placeholder: m, 
             screen_placeholder: s, 
             user_info_placeholder:u,
