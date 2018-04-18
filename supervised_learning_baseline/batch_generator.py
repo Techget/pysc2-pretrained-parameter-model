@@ -37,7 +37,11 @@ class batchGenerator(object):
 				winner_id = int(pi['playerResult']['playerId'])
 				break
 
-		assert(winner_id != -1)
+		# assert(winner_id != -1)
+		if winner_id == -1:
+			print(info_dict)
+			return self.next_batch(get_action_id_only)
+			
 		minimap_output = []
 		screen_output = []
 		action_output = []
