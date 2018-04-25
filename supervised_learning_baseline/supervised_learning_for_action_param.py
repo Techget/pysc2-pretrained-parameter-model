@@ -8,12 +8,18 @@ screen_placeholder = tf.placeholder(tf.float32, [None, 64, 64, 10])
 user_info_placeholder = tf.placeholder(tf.float32, [None, 11])
 action_placeholder = tf.placeholder(tf.float32, [None, 524]) # one hot
 
+# arg_placeholder will look like
+# [
+#     [[0],[1, 2]],
+#     [[1],[5]], ...
+# ]
+# arg_placeholder = tf.placeholder(tf.float32, [None, None, None]) 
 # 
 arg_screen_replay_ouput = tf.placeholder(tf.float32, [None, 2])
-# arg_screen2_replay_ouput = tf.placeholder(tf.float32, [None, 2])
-# arg_minimap_replay_ouput = tf.placeholder(tf.float32, [None, 2])
-# arg_queued_replay_output = tf.placeholder(tf.float32, [None, 1])
-# arg_control_group_act_replay_output = tf.placeholder(tf.float32, [None, 1])
+arg_screen2_replay_ouput = tf.placeholder(tf.float32, [None, 2])
+arg_minimap_replay_ouput = tf.placeholder(tf.float32, [None, 2])
+arg_queued_replay_output = tf.placeholder(tf.float32, [None, 1])
+arg_control_group_act_replay_output = tf.placeholder(tf.float32, [None, 1])
 
 # minimap
 conv1_minimap = tf.layers.conv2d(   
