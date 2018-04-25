@@ -27,9 +27,9 @@ conv2_minimap = tf.layers.conv2d(pool1_minimap, 32, 5, 1, 'same', activation=tf.
 pool2_minimap = tf.layers.max_pooling2d(conv2_minimap, 2, 2)    # -> (16, 16, 32)
 flat_minimap = tf.reshape(pool2_minimap, [-1, 16*16*32])          # -> (16*14632, )
 dense_minimap = tf.layers.dense(inputs=flat_minimap, units=1024, activation=tf.nn.relu)
-dropout_mininmap = tf.layers.dropout(
-    inputs=dense_minimap, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
-minimap_output = tf.layers.dense(dropout_mininmap, 256)
+# dropout_mininmap = tf.layers.dropout(
+#     inputs=dense_minimap, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
+minimap_output = tf.layers.dense(dense_minimap, 256)
 
 # screen
 conv1_screen = tf.layers.conv2d(   
@@ -49,23 +49,22 @@ conv2_screen = tf.layers.conv2d(pool1_screen, 32, 5, 1, 'same', activation=tf.nn
 pool2_screen = tf.layers.max_pooling2d(conv2_screen, 2, 2)    # -> (16, 16, 32)
 flat_screen = tf.reshape(pool2_screen, [-1, 16*16*32])          # -> (16*16*32, )
 dense_screen = tf.layers.dense(inputs=flat_screen, units=1024, activation=tf.nn.relu)
-dropout_screen = tf.layers.dropout(
-    inputs=dense_screen, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
-screen_output = tf.layers.dense(dropout_screen, 256)
+# dropout_screen = tf.layers.dropout(
+#     inputs=dense_screen, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
+screen_output = tf.layers.dense(dense_screen, 256)
 
 # user info
 l1_user_info = tf.layers.dense(user_info_placeholder, 11, tf.tanh)
-user_info_output = tf.layers.dens(l1_user_info, 5)
+user_info_output = tf.layers.dense(l1_user_info, 5)
 
 # regression, NOT SURE IF THIS IS suitable regression
-input_to_classification = tf.concat(concat_dim=1,\
-    values=[minimap_output, screen_output, user_info_output])
+input_to_classification = tf.concat([minimap_output, screen_output, user_info_output], 1)
 
 l2_classification = tf.layers.dense(input_to_classification, 1024, tf.nn.relu)
 classification_output = tf.layers.dense(l2_classification, 524)              # output layer
 loss = tf.losses.softmax_cross_entropy(onehot_labels=action_output, logits=classification_output)
 
-training_op = tf.train.GradientDescentOptimizer(0.001).minimize(loss)
+train_op = tf.train.GradientDescentOptimizer(0.001).minimize(loss)
 tf.summary.scalar('loss', loss) # add loss to scalar summary
 
 accuracy = tf.metrics.accuracy(          # return (acc, update_op), and create 2 local variables
@@ -73,7 +72,10 @@ accuracy = tf.metrics.accuracy(          # return (acc, update_op), and create 2
 
 
 sess = tf.Session()                                 # control training and others
-sess.run(tf.global_variables_initializer())         # initialize var in graph
+# sess.run(tf.global_variables_initializer(), tf.local_variables_initializer())    # initialize var in graph
+init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer()) # the local var is for accuracy_op
+sess.run(init_op) # initialize var in graph
+
 saver = tf.train.Saver() # define a saver for saving and restoring
 writer = tf.summary.FileWriter('./log', sess.graph)     # write to file
 merge_op = tf.summary.merge_all() # operation to merge all summary
@@ -94,7 +96,10 @@ for step in range(1000):                             # train
             screen_placeholder: s, 
             user_info_placeholder:u,
             action_output: a})
-    print('Step:', step, '| train loss: %.4f' % loss_, '| test accuracy: %.2f' % accuracy_)
+        print('Step:', step, '| train loss: ', loss_, '| test accuracy: ', accuracy_)
+
+    print('~~~~~~~~~')
+
 
 saver.save(sess, './params', write_meta_graph=False)  # meta_graph is not recommended
 
