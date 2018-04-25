@@ -87,8 +87,6 @@ class batchGenerator(object):
 				one_hot = np.zeros((1, 524)) # shape will be 1*254
 				one_hot[np.arange(1), [action[0]]] = 1
 
-				# action_param_types = pysc2.actions.FUNCTION_TYPES[pysc2_actions.FUNCTIONS[action[0]].function_type]				
-
 				# for param in action[2]:
 				minimap_output.append(m_temp)
 				screen_output.append(s_temp)
@@ -177,7 +175,10 @@ class batchGenerator(object):
 				one_hot = np.zeros((1, 524)) # shape will be 1*254
 				one_hot[np.arange(1), [action[0]]] = 1
 
-				# action_param_types = pysc2.actions.FUNCTION_TYPES[pysc2_actions.FUNCTIONS[action[0]].function_type]				
+				action_param_type = pysc2.actions.FUNCTION_TYPES[pysc2_actions.FUNCTIONS[action[0]].function_type]				
+
+				if action_param_type == 'no_op' or action_param_type = 'autocast':
+					continue
 
 				# for param in action[2]:
 				minimap_output.append(m_temp)
@@ -185,6 +186,7 @@ class batchGenerator(object):
 				action_output.append(one_hot[0])
 				player_info_output.append(pi_temp)
 				ground_truth_parameters.append(param)
+				function_types.append(action_param_type)
 
 		assert(len(minimap_output) == len(ground_truth_parameters))
 
@@ -193,5 +195,5 @@ class batchGenerator(object):
 			# the defeated person, we need to skip the replay file
 			return self.next_batch()
 
-		return minimap_output, screen_output, action_output, player_info_output, ground_truth_parameters
+		return minimap_output, screen_output, action_output, player_info_output, ground_truth_parameters, function_types
 

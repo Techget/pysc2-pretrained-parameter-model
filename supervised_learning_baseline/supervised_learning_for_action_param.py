@@ -1,6 +1,9 @@
 import tensorflow as tf
 import numpy as np
 from batch_generator import batchGenerator
+import pysc2.lib.actions as pysc2_actions
+
+LR = 0.0001
 
 
 minimap_placeholder = tf.placeholder(tf.float32, [None, 64, 64, 5])
@@ -13,13 +16,22 @@ action_placeholder = tf.placeholder(tf.float32, [None, 524]) # one hot
 #     [[0],[1, 2]],
 #     [[1],[5]], ...
 # ]
-# arg_placeholder = tf.placeholder(tf.float32, [None, None, None]) 
-# 
+arg_placeholder = tf.placeholder(tf.float32, [None, None, None]) # then assign values in this placeholder to following placeholders
+
+# arg outputs
 arg_screen_replay_ouput = tf.placeholder(tf.float32, [None, 2])
 arg_screen2_replay_ouput = tf.placeholder(tf.float32, [None, 2])
 arg_minimap_replay_ouput = tf.placeholder(tf.float32, [None, 2])
 arg_queued_replay_output = tf.placeholder(tf.float32, [None, 1])
 arg_control_group_act_replay_output = tf.placeholder(tf.float32, [None, 1])
+arg_control_group_id_output = tf.placeholder(tf.float32, [None, 1])
+arg_select_point_act_output = tf.placeholder(tf.float32, [None, 1])
+arg_select_add_output = tf.placeholder(tf.float32, [None, 1])
+arg_select_unit_act_output = tf.placeholder(tf.float32, [None, 1])
+arg_select_unit_id_output = tf.placeholder(tf.float32, [None, 1])
+arg_select_worker_output = tf.placeholder(tf.float32, [None, 1])
+arg_build_queue_id_output = tf.placeholder(tf.float32, [None, 1])
+arg_unload_id_output = tf.placeholder(tf.float32, [None, 1])
 
 # minimap
 conv1_minimap = tf.layers.conv2d(   
@@ -77,20 +89,29 @@ user_info_output = tf.layers.dense(l1_user_info, 5)
 # processed concatenated input
 concat_input = tf.concat([minimap_output, screen_output, action_output, user_info_output], 1)
 
-##### arg Types
-# screen 
-# arg_screen_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
-# arg_screen_output = tf.layers.dense(arg_screen_dense, 2)
-# arg_screen_loss = tf.reduce_mean(tf.square(arg_screen_output - X_Y_ouput))
-# train_op = tf.train.GradientDescentOptimizer(0.001).minimize(arg_screen_loss)
-# tf.summary.scalar('loss', loss) # add loss to scalar summary
-
-# minimap 
-
+##### arg_type outputs
+# screen
+screen_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
+screen_output_pred = tf.layers.dense(screen_output_dense, 2)
+screen_output_loss = tf.reduce_mean(tf.square(screen_output_pred - arg_screen_replay_ouput))
+# minimap
+minimap_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
+minimap_output_pred = tf.layers.dense(minimap_output_dense, 2)
+minimap_output_loss = tf.reduce_mean(tf.square(minimap_output_pred - arg_minimap_replay_ouput))
 # screen2
-
+screen2_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
+screen2_output_pred = tf.layers.dense(screen2_output_dense, 2)
+screen2_output_loss = tf.reduce_mean(tf.square(screen2_output_pred - arg_screen2_replay_ouput))
 # queued
+queued_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
+queued_output_logits = tf.layers.dense(queued_output_dense, 2) # enum, [False, True]
 
+queued_pred = tf.nn.softmax(queued_output_logits, name="y_pred")
+queued_pred_cls = tf.argmax(queued_pred, dimension=1)
+
+queued_cross_entropy = tf.losses.sparse_softmax_cross_entropy(labels=arg_queued_replay_output, 
+    logits=queued_output_logits)
+queudd_loss = tf.reduce_mean(cross_entropy)
 # control_group_act
 
 # control_group_id
@@ -108,6 +129,16 @@ concat_input = tf.concat([minimap_output, screen_output, action_output, user_inf
 # build_queue_id
 
 # unload_id
+
+
+
+
+
+
+
+## Function types for output
+
+
 
 regression_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 # dropout_regression = tf.layers.dropout(
@@ -128,7 +159,7 @@ merge_op = tf.summary.merge_all() # operation to merge all summary
 
 bg = batchGenerator()
 for step in range(1000):                             # train
-    m,s,a,u,y =  bg.next_batch()
+    m,s,a,u,y,ft =  bg.next_batch_params()
     _, loss_, result = sess.run([train_op, loss, merge_op],
         {minimap_placeholder: m, 
         screen_placeholder: s, 
