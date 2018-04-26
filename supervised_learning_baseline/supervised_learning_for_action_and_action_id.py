@@ -83,12 +83,6 @@ merge_op = tf.summary.merge_all() # operation to merge all summary
 bg = batchGenerator()
 for step in range(1000):                             # train
     m,s,u,a =  bg.next_batch()
-    _, loss_, result = sess.run([train_op, loss, merge_op],
-        {minimap_placeholder: m, 
-        screen_placeholder: s, 
-        user_info_placeholder:u,
-        action_output: a})
-    writer.add_summary(result, step)
 
     if step % 50 == 0:
         accuracy_ = sess.run([accuracy],
@@ -97,6 +91,14 @@ for step in range(1000):                             # train
             user_info_placeholder:u,
             action_output: a})
         print('Step:', step, '| train loss: ', loss_, '| test accuracy: ', accuracy_)
+    else:
+        _, loss_, result = sess.run([train_op, loss, merge_op],
+            {minimap_placeholder: m, 
+            screen_placeholder: s, 
+            user_info_placeholder:u,
+            action_output: a})
+
+    writer.add_summary(result, step)
 
     print('~~~~~~~~~')
 

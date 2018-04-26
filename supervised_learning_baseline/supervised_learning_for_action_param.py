@@ -18,7 +18,7 @@ action_placeholder = tf.placeholder(tf.float32, [None, 524]) # one hot
 # ]
 arg_placeholder = tf.placeholder(tf.float32, [None, None, None]) # then assign values in this placeholder to following placeholders
 
-# arg outputs
+# arg outputs placeholders
 arg_screen_replay_ouput = tf.placeholder(tf.float32, [None, 2])
 arg_screen2_replay_ouput = tf.placeholder(tf.float32, [None, 2])
 arg_minimap_replay_ouput = tf.placeholder(tf.float32, [None, 2])
@@ -89,7 +89,7 @@ user_info_output = tf.layers.dense(l1_user_info, 5)
 # processed concatenated input
 concat_input = tf.concat([minimap_output, screen_output, action_output, user_info_output], 1)
 
-##### arg_type outputs
+##### arg_type output loss
 # screen
 screen_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 screen_output_pred = tf.layers.dense(screen_output_dense, 2)
@@ -105,15 +105,19 @@ screen2_output_loss = tf.reduce_mean(tf.square(screen2_output_pred - arg_screen2
 # queued
 queued_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 queued_output_logits = tf.layers.dense(queued_output_dense, 2) # enum, [False, True]
-
-queued_pred = tf.nn.softmax(queued_output_logits, name="y_pred")
+queued_pred = tf.nn.softmax(queued_output_logits, name="queued_pred")
 queued_pred_cls = tf.argmax(queued_pred, dimension=1)
-
 queued_cross_entropy = tf.losses.sparse_softmax_cross_entropy(labels=arg_queued_replay_output, 
     logits=queued_output_logits)
-queudd_loss = tf.reduce_mean(cross_entropy)
+queudd_loss = tf.reduce_mean(queued_cross_entropy)
 # control_group_act
-
+control_group_act_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
+control_group_act_logits = tf.layers.dense(control_group_act_output_dense,5) #enum, 5 output, start with 0 
+control_group_act_pred = tf.nn.softmax(control_group_act_logits, name="control_group_act_pred")
+control_group_act_cls = tf.argmax(control_group_act_pred, dimension=1)
+control_group_act_cross_entropy = tf.losses.sparse_softmax_cross_entropy(labels=arg_control_group_act_replay_output, 
+    logits=control_group_act_logits)
+control_group_act_loss = tf.reduce_mean(control_group_act_cross_entropy)
 # control_group_id
 
 # select_point_act
