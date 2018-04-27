@@ -10,7 +10,7 @@ map_used = "Abyssal Reef LE" #"Odyssey LE"
 race_used = "Terran"
 home_dir = expanduser("~")
 home_dir += '/'
-parsed_directory = home_dir+'pysc2-replay/data/'
+parsed_directory = home_dir+'pysc2-replay/data_64/'
 extracted_directory = home_dir+'pysc2-replay/data_'+map_used+'_'+race_used+'/'
 
 
