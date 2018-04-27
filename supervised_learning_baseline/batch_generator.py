@@ -60,9 +60,9 @@ class batchGenerator(object):
 					CONTAIN_FLAG = True
 					break
 
-			if info_dict['mapName'] == map_used and \
-				info_dict['playerInfo'][0]['playerInfo']['raceActual'] == race_used and \
-				info_dict['playerInfo'][1]['playerInfo']['raceActual'] == race_used and \
+			if info_dict['mapName'] == self.used_map and \
+				info_dict['playerInfo'][0]['playerInfo']['raceActual'] == self.player1_used_race and \
+				info_dict['playerInfo'][1]['playerInfo']['raceActual'] == self.player2_used_race and \
 				winner_id != -1 and \
 				CONTAIN_FLAG == True:
 
