@@ -1,11 +1,14 @@
 import tensorflow as tf
 import numpy as np
 from batch_generator import batchGenerator
+import pysc2.lib.actions as pysc2_actions
 
 
 minimap_placeholder = tf.placeholder(tf.float32, [None, 64, 64, 5])
 screen_placeholder = tf.placeholder(tf.float32, [None, 64, 64, 10])
 user_info_placeholder = tf.placeholder(tf.float32, [None, 11])
+available_action_placeholder = tf.placeholder(tf.float32, [None, len(pysc2_actions.FUNCTIONS)])
+
 action_output = tf.placeholder(tf.float32, [None, 524]) # one hot
 # X_Y_ouput = tf.placeholder([-1, 2])
 
@@ -53,16 +56,27 @@ dense_screen = tf.layers.dense(inputs=flat_screen, units=1024, activation=tf.nn.
 #     inputs=dense_screen, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
 screen_output = tf.layers.dense(dense_screen, 256)
 
+# avaliable actions
+l1_available_actions = tf.layers.dense(available_action_placeholder, 128, tf.nn.relu)
+avaliable_actions_output = tf.layers.dense(l1_available_actions, 32, tf.nn.relu)
+
 # user info
 l1_user_info = tf.layers.dense(user_info_placeholder, 11, tf.tanh)
 user_info_output = tf.layers.dense(l1_user_info, 5)
 
+
 # regression, NOT SURE IF THIS IS suitable regression
-input_to_classification = tf.concat([minimap_output, screen_output, user_info_output], 1)
+input_to_classification = tf.concat([minimap_output, screen_output, avaliable_actions_output, user_info_output], 1)
 
 l2_classification = tf.layers.dense(input_to_classification, 1024, tf.nn.relu)
 classification_output = tf.layers.dense(l2_classification, 524)              # output layer
 loss = tf.losses.softmax_cross_entropy(onehot_labels=action_output, logits=classification_output)
+
+# want to maximize this valid_action_loss
+valid_action_loss = tf.reduce_sum(tf.reduce_sum(classification_output * available_action_placeholder, axis=1))
+
+# multiply by -1 so that it fit for minimize
+loss += valid_action_loss * (-1)
 
 train_op = tf.train.GradientDescentOptimizer(0.001).minimize(loss)
 tf.summary.scalar('loss', loss) # add loss to scalar summary
@@ -82,19 +96,21 @@ merge_op = tf.summary.merge_all() # operation to merge all summary
 
 bg = batchGenerator()
 for step in range(5000):                             # train
-    m,s,u,a =  bg.next_batch()
+    m,s,u,aa,a =  bg.next_batch()
     _, loss_, result = sess.run([train_op, loss, merge_op],
         {minimap_placeholder: m, 
         screen_placeholder: s, 
         user_info_placeholder:u,
+        available_action_placeholder:aa,
         action_output: a})
 
     if step % 50 == 0:
-        m,s,u,a =  bg.next_batch(get_validation_data=True)
+        m,s,u,aa,a =  bg.next_batch(get_validation_data=True)
         accuracy_ = sess.run([accuracy],
             {minimap_placeholder: m, 
             screen_placeholder: s, 
             user_info_placeholder:u,
+            available_action_placeholder:aa,
             action_output: a})
         print('Step:', step,'| loss_: ', loss_, '| test accuracy: ', accuracy_)
 

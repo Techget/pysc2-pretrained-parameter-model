@@ -136,6 +136,7 @@ class batchGenerator(object):
 		screen_output = []
 		action_output = []
 		player_info_output = []
+		available_actions_output = []
 
 
 		output_counter = 0
@@ -174,6 +175,7 @@ class batchGenerator(object):
 				screen_output.append(s_temp)
 				action_output.append(one_hot[0])
 				player_info_output.append(pi_temp)
+				available_actions_output.append(np.array(state['available_actions']))
 
 			if output_counter >= self.BATCH_SIZE_LIMIT:
 				break
@@ -189,7 +191,7 @@ class batchGenerator(object):
 			# the defeated person, we need to skip the replay file
 			return self.next_batch()
 
-		return minimap_output, screen_output, player_info_output, action_output
+		return minimap_output, screen_output, player_info_output, available_actions_output, action_output
 
 
 	# every batch corresponding to 1 replay file, action params
