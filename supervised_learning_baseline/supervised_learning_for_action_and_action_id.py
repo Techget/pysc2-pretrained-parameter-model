@@ -89,7 +89,7 @@ for step in range(2000):                             # train
             screen_placeholder: s, 
             user_info_placeholder:u,
             action_output: a})
-        print('Step:', step, '| train loss: ', loss_, '| test accuracy: ', accuracy_)
+        print('Step:', step, '| test accuracy: ', accuracy_)
     else:
         m,s,u,a =  bg.next_batch()
         _, loss_, result = sess.run([train_op, loss, merge_op],
@@ -97,10 +97,9 @@ for step in range(2000):                             # train
             screen_placeholder: s, 
             user_info_placeholder:u,
             action_output: a})
+        print('loss_ | ', loss_)
 
     writer.add_summary(result, step)
-
-    print('~~~~~~~~~')
 
 
 saver.save(sess, './params', write_meta_graph=False)  # meta_graph is not recommended

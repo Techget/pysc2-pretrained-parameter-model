@@ -68,7 +68,7 @@ class batchGenerator(object):
 				del self.parsed_filenames[self.next_index - 1] # remove from training data set
 				self.validation_file_name = full_filename
 				self.validation_winner_id = winner_id
-				print(full_filename, replay_data)
+				# print(full_filename, replay_data)
 				FIND_FLAG = True
 
 
