@@ -13,6 +13,11 @@ class batchGenerator(object):
 		self.parsed_directory = self.home_dir+'/pysc2-replay/data_full/' 
 		self.parsed_filenames = os.listdir(self.parsed_directory)
 		self.next_index = 0
+		
+		self.next_index_within_file = 0
+		self.winner_id_within_file = -1
+		self.BATCH_SIZE_LIMIT = 1000
+
 		self.dimension = 64
 		self.used_map = 'Abyssal Reef LE'
 		self.player1_used_race = 'Terran' # Terran vs Terran only
@@ -81,8 +86,15 @@ class batchGenerator(object):
 			replay_data = pickle.load(open(self.validation_file_name, "rb"))
 			winner_id = self.validation_winner_id
 
+		if self.next_index_within_file != 0:
+			replay_data = pickle.load(open(self.parsed_directory+self.parsed_filenames[self.next_index-1], "rb"))
+			winner_id = self.winner_id_within_file
+
 		while replay_data == []:
 			full_filename = self.parsed_directory+self.parsed_filenames[self.next_index]
+			if full_filename == self.validation_file_name:
+				continue
+
 			if os.path.getsize(full_filename) == 0:
 				del self.parsed_filenames[self.next_index]
 				full_filename = self.parsed_directory+self.parsed_filenames[self.next_index]
@@ -124,9 +136,12 @@ class batchGenerator(object):
 		action_output = []
 		player_info_output = []
 
-		ground_truth_parameters = []
 
-		for state in replay_data['state']:
+		output_counter = 0
+		self.winner_id_within_file = winner_id
+		for state in replay_data['state'][self.next_index_within_file:]:
+			self.next_index_within_file += 1 
+
 			if state['actions'] == []:
 				continue
 
@@ -149,6 +164,7 @@ class batchGenerator(object):
 					# filter repeated action
 					continue
 
+				output_counter += 1
 				one_hot = np.zeros((1, 524)) # shape will be 1*254
 				one_hot[np.arange(1), [action[0]]] = 1
 
@@ -157,10 +173,16 @@ class batchGenerator(object):
 				screen_output.append(s_temp)
 				action_output.append(one_hot[0])
 				player_info_output.append(pi_temp)
-				# ground_truth_parameters.append(param)
+
+			if output_counter >= self.BATCH_SIZE_LIMIT:
+				break
+
+		if output_counter < self.BATCH_SIZE_LIMIT:
+			# means finishing reading the current file
+			self.next_index_within_file = 0
+			self.winner_id_within_file = -1
 
 		assert(len(minimap_output) == len(action_output))
-
 		if len(minimap_output) == 0:
 			# The replay file only record one person's operation, so if it is 
 			# the defeated person, we need to skip the replay file
