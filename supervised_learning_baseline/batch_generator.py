@@ -60,11 +60,10 @@ class batchGenerator(object):
 					CONTAIN_FLAG = True
 					break
 
-			if info_dict['mapName'] == self.used_map and \
-				info_dict['playerInfo'][0]['playerInfo']['raceActual'] == self.player1_used_race and \
-				info_dict['playerInfo'][1]['playerInfo']['raceActual'] == self.player2_used_race and \
-				winner_id != -1 and \
-				CONTAIN_FLAG == True:
+			# if info_dict['mapName'] == self.used_map and \
+			# 	info_dict['playerInfo'][0]['playerInfo']['raceActual'] == self.player1_used_race and \
+			# 	info_dict['playerInfo'][1]['playerInfo']['raceActual'] == self.player2_used_race and \
+			if winner_id != -1 and CONTAIN_FLAG == True:
 
 				del self.parsed_filenames[self.next_index - 1] # remove from training data set
 				self.validation_file_name = full_filename
@@ -104,10 +103,10 @@ class batchGenerator(object):
 			loaded_replay_info_json = MessageToJson(replay_data['info'])
 			info_dict = json.loads(loaded_replay_info_json)
 
-			if info_dict['mapName'] != self.used_map or \
-				info_dict['playerInfo'][0]['playerInfo']['raceActual'] == self.player1_used_race or \
-				info_dict['playerInfo'][1]['playerInfo']['raceActual'] == self.player2_used_race:
-				continue
+			# if info_dict['mapName'] != self.used_map or \
+			# 	info_dict['playerInfo'][0]['playerInfo']['raceActual'] == self.player1_used_race or \
+			# 	info_dict['playerInfo'][1]['playerInfo']['raceActual'] == self.player2_used_race:
+			# 	continue
 
 			winner_id = -1
 			for pi in info_dict['playerInfo']:
