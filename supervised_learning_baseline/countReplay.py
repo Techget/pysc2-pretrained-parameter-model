@@ -34,6 +34,7 @@ for fn in os.listdir(parsed_directory):
 	if info_dict['mapName'] in counter and race_used in counter[info_dict['mapName']]:
 		counter[info_dict['mapName']][race_used] += 1
 	else:
+		counter[info_dict['mapName']] = {}
 		counter[info_dict['mapName']][race_used] = 1
 
 
