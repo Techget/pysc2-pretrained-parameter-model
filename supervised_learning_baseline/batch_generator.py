@@ -10,17 +10,78 @@ import pysc2.lib.actions as pysc2_actions
 class batchGenerator(object):
 	def __init__(self):
 		self.home_dir = expanduser("~")
-		self.parsed_directory = self.home_dir+'/pysc2-replay/data_64/'
+		self.parsed_directory = self.home_dir+'/pysc2-replay/data/'
 		self.parsed_filenames = os.listdir(self.parsed_directory)
 		self.next_index = 0
 		self.dimension = 64
 		self.used_map = 'Abyssal Reef LE'
-		self.used_race = 'Terran' # Terran vs Terran only
+		self.player1_used_race = 'Terran' # Terran vs Terran only
+		self.player2_used_race = 'Terran' # Terran vs Terran only
+		self.reserve_validation_file()
+
+
+	# reserve one file as validation data set, also warm up the validation 
+	def reserve_validation_file(self):
+		FIND_FLAG = False
+
+		# warm up the self.next_index as well
+		while FIND_FLAG == False:
+			full_filename = self.parsed_directory+self.parsed_filenames[self.next_index]
+			if os.path.getsize(full_filename) == 0:
+				del self.parsed_filenames[self.next_index]
+				full_filename = self.parsed_directory+self.parsed_filenames[self.next_index]
+				if self.next_index >= len(self.parsed_filenames):
+					self.next_index = 0
+				continue
+
+			self.next_index += 1
+			try:
+				replay_data = pickle.load(open(full_filename, "rb"))
+			except:
+				replay_data = []
+				continue
+
+			loaded_replay_info_json = MessageToJson(replay_data['info'])
+			info_dict = json.loads(loaded_replay_info_json)
+
+			winner_id = -1
+			for pi in info_dict['playerInfo']:
+				if pi['playerResult']['result'] == 'Victory':
+					winner_id = int(pi['playerResult']['playerId'])
+					break
+
+			CONTAIN_FLAG = False
+			for state in replay_data['state']:
+				if state['actions'] == []:
+					continue
+				# player info
+				pi_temp = np.array(state['player'])
+				if pi_temp[0] == winner_id:
+					CONTAIN_FLAG = True
+					break
+
+			if info_dict['mapName'] == map_used and \
+				info_dict['playerInfo'][0]['playerInfo']['raceActual'] == race_used and \
+				info_dict['playerInfo'][1]['playerInfo']['raceActual'] == race_used and \
+				winner_id != -1 and \
+				CONTAIN_FLAG == True:
+
+				del self.parsed_filenames[self.next_index - 1] # remove from training data set
+				self.validation_file_name = full_filename
+				self.validation_winner_id = winner_id
+				print(full_filename, replay_data)
+				FIND_FLAG = True
+
 
 	# every batch corresponding to 1 replay file
-	def next_batch(self):
+	def next_batch(self, get_validation_data = False):
 		replay_data = []
 		winner_id = -1
+
+		if get_validation_data != False:
+			replay_data = pickle.load(open(self.validation_file_name, "rb"))
+			winner_id = self.validation_winner_id
+
 		while replay_data == []:
 			full_filename = self.parsed_directory+self.parsed_filenames[self.next_index]
 			if os.path.getsize(full_filename) == 0:
@@ -42,6 +103,11 @@ class batchGenerator(object):
 
 			loaded_replay_info_json = MessageToJson(replay_data['info'])
 			info_dict = json.loads(loaded_replay_info_json)
+
+			if info_dict['mapName'] != self.used_map or \
+				info_dict['playerInfo'][0]['playerInfo']['raceActual'] == self.player1_used_race or \
+				info_dict['playerInfo'][1]['playerInfo']['raceActual'] == self.player2_used_race:
+				continue
 
 			winner_id = -1
 			for pi in info_dict['playerInfo']:
@@ -99,16 +165,20 @@ class batchGenerator(object):
 		if len(minimap_output) == 0:
 			# The replay file only record one person's operation, so if it is 
 			# the defeated person, we need to skip the replay file
-			return self.next_batch(get_action_id_only)
+			return self.next_batch()
 
 		return minimap_output, screen_output, player_info_output, action_output
 
 
-
 	# every batch corresponding to 1 replay file, action params
-	def next_batch_params(self):
+	def next_batch_params(self, get_validation_data = False):
 		replay_data = []
 		winner_id = -1
+
+		if get_validation_data != False:
+			replay_data = pickle.load(open(self.validation_file_name, "rb"))
+			winner_id = self.validation_winner_id
+
 		while replay_data == []:
 			full_filename = self.parsed_directory+self.parsed_filenames[self.next_index]
 			if os.path.getsize(full_filename) == 0:
@@ -196,4 +266,15 @@ class batchGenerator(object):
 			return self.next_batch()
 
 		return minimap_output, screen_output, action_output, player_info_output, ground_truth_parameters, function_types
+
+
+
+
+
+
+
+
+
+
+
 

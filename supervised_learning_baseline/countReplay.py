@@ -4,6 +4,7 @@ import shutil
 import pickle
 from google.protobuf.json_format import MessageToJson
 import json
+from tqdm import tqdm
 
 map_used = "Abyssal Reef LE" #"Odyssey LE"
 race_used = "Terran"
@@ -15,7 +16,7 @@ extracted_directory = home_dir+'pysc2-replay/data_'+map_used+'_'+race_used+'/'
 
 counter = {}
 
-for fn in os.listdir(parsed_directory):
+for fn in tqdm(os.listdir(parsed_directory)):
 	full_filename = parsed_directory+fn
 
 	try:
