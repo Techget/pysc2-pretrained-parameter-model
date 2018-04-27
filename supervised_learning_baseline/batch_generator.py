@@ -247,7 +247,7 @@ class batchGenerator(object):
 
 				action_param_type = pysc2.actions.FUNCTION_TYPES[pysc2_actions.FUNCTIONS[action[0]].function_type]				
 
-				if action_param_type == 'no_op' or action_param_type = 'autocast':
+				if action_param_type == 'no_op' or action_param_type == 'autocast':
 					continue
 
 				# for param in action[2]:
