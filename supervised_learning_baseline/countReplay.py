@@ -2,6 +2,8 @@ import os
 from os.path import expanduser
 import shutil
 import pickle
+from google.protobuf.json_format import MessageToJson
+import json
 
 map_used = "Abyssal Reef LE" #"Odyssey LE"
 race_used = "Terran"
