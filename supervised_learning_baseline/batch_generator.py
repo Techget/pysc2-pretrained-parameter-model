@@ -16,7 +16,7 @@ class batchGenerator(object):
 		
 		self.next_index_within_file = 0
 		self.winner_id_within_file = -1
-		self.BATCH_SIZE_LIMIT = 2000
+		self.BATCH_SIZE_LIMIT = 1000
 
 		self.dimension = 64
 		self.used_map = 'Abyssal Reef LE'
