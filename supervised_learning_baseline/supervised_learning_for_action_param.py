@@ -109,7 +109,7 @@ queued_pred = tf.nn.softmax(queued_output_logits, name="queued_pred")
 queued_pred_cls = tf.argmax(queued_pred, dimension=1)
 queued_cross_entropy = tf.losses.sparse_softmax_cross_entropy(labels=arg_queued_replay_output, 
     logits=queued_output_logits)
-queudd_loss = tf.reduce_mean(queued_cross_entropy)
+queued_loss = tf.reduce_mean(queued_cross_entropy)
 # control_group_act
 control_group_act_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 control_group_act_logits = tf.layers.dense(control_group_act_output_dense,5) #enum, 5 output, start with 0 
@@ -119,28 +119,72 @@ control_group_act_cross_entropy = tf.losses.sparse_softmax_cross_entropy(labels=
     logits=control_group_act_logits)
 control_group_act_loss = tf.reduce_mean(control_group_act_cross_entropy)
 # control_group_id
-
+control_group_id_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
+control_group_id_output = tf.layers.dense(control_group_id_output_dense, 1)
+control_group_id_loss = tf.square(control_group_id_output - arg_control_group_id_output)
 # select_point_act
-
+select_point_act_dense = tf.layers.desne(concat_input, 16, tf.nn.relu)
+select_point_act_logits = tf.layers.dense(select_point_act_dense, 4) # enum, 4 output
+select_point_act_pred = tf.nn.softmax(select_point_act_logits, name="select_point_act_pred")
+select_point_act_cls = tf.argmax(select_point_act_pred, dimension=1)
+select_point_act_cross_entropy = tf.losses.sparse_softmax_cross_entropy(labels=arg_select_point_act_output, 
+    logits=select_point_act_logits)
+select_point_act_loss = tf.reduce_mean(select_point_act_cross_entropy)
 # select_add
-
+select_add_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
+select_add_output_logits = tf.layers.dense(select_add_output_dense, 2) # enum, [False, True]
+select_add_pred = tf.nn.softmax(select_add_output_logits, name="select_add_pred")
+select_add_pred_cls = tf.argmax(select_add_pred, dimension=1)
+select_add_cross_entropy = tf.losses.sparse_softmax_cross_entropy(labels=arg_select_add_output, 
+    logits=select_add_output_logits)
+select_add_loss = tf.reduce_mean(select_add_cross_entropy)
 # select_unit_act
-
+select_unit_act_dense = tf.layers.desne(concat_input, 16, tf.nn.relu)
+select_unit_act_logits = tf.layers.dense(select_unit_act_dense, 4) # enum, 4 output
+select_unit_act_pred = tf.nn.softmax(select_unit_act_logits, name="select_unit_act_pred")
+select_unit_act_cls = tf.argmax(select_unit_act_pred, dimension=1)
+select_unit_act_cross_entropy = tf.losses.sparse_softmax_cross_entropy(labels=arg_select_unit_act_output, 
+    logits=select_unit_act_logits)
+select_unit_act_loss = tf.reduce_mean(select_unit_act_cross_entropy)
 # select_unit_id
-
+select_unit_id_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
+select_unit_id_output = tf.layers.dense(select_unit_id_output_dense, 1)
+select_unit_id_loss = tf.square(select_unit_id_output - arg_select_unit_id_output)
 # select_worker
-
+select_worker_dense = tf.layers.desne(concat_input, 16, tf.nn.relu)
+select_worker_logits = tf.layers.dense(select_worker_dense, 4) # enum, 4 output
+select_worker_pred = tf.nn.softmax(select_worker_logits, name="select_worker_pred")
+select_worker_cls = tf.argmax(select_worker_pred, dimension=1)
+select_worker_cross_entropy = tf.losses.sparse_softmax_cross_entropy(labels=arg_select_worker_output, 
+    logits=select_worker_logits)
+select_worker_loss = tf.reduce_mean(select_worker_cross_entropy)
 # build_queue_id
-
+build_queue_id_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
+build_queue_id_output = tf.layers.dense(build_queue_id_output_dense, 1)
+build_queue_id_loss = tf.square(build_queue_id_output - arg_build_queue_id_output)
 # unload_id
+unload_id_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
+unload_id_output = tf.layers.dense(unload_id_output_dense, 1)
+unload_id_loss = tf.square(unload_id_output - arg_unload_id_output)
+
+####### Function types for output
+Function_type_losses = {
+    'move_camera': minimap_output_loss,
+    'select_point': select_point_act_loss+screen_output_loss,
+    'select_rect': select_add_loss+screen2_output_loss,
+    'select_unit': select_unit_act_loss+select_unit_id_loss,
+    'control_group': control_group_act_loss+control_group_id_loss,
+    'select_idle_worker': select_worker_loss,
+    'select_army': select_add_loss,
+    'select_warp_gates': select_add_loss,
+    'unload': unload_id_loss,
+    'build_queue': build_queue_id_loss,
+    'cmd_quick': queued_loss,
+    'cmd_screen': queued_loss+screen_output_loss,
+    'cmd_minimap': queued_loss+minimap_output_loss,
+}
 
 
-
-
-
-
-
-## Function types for output
 
 
 
