@@ -10,7 +10,7 @@ import pysc2.lib.actions as pysc2_actions
 class batchGenerator(object):
 	def __init__(self):
 		self.home_dir = expanduser("~")
-		self.parsed_directory = self.home_dir+'/pysc2-replay/data/'
+		self.parsed_directory = self.home_dir+'/pysc2-replay/data_full/' 
 		self.parsed_filenames = os.listdir(self.parsed_directory)
 		self.next_index = 0
 		self.dimension = 64

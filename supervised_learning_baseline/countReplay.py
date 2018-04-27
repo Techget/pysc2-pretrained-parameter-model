@@ -10,11 +10,12 @@ map_used = "Abyssal Reef LE" #"Odyssey LE"
 race_used = "Terran"
 home_dir = expanduser("~")
 home_dir += '/'
-parsed_directory = home_dir+'pysc2-replay/data_64/'
+parsed_directory = home_dir+'pysc2-replay/data_full/'
 extracted_directory = home_dir+'pysc2-replay/data_'+map_used+'_'+race_used+'/'
 
 
 counter = {}
+i = 0
 
 for fn in tqdm(os.listdir(parsed_directory)):
 	full_filename = parsed_directory+fn
@@ -38,6 +39,11 @@ for fn in tqdm(os.listdir(parsed_directory)):
 		counter[info_dict['mapName']] = {}
 		counter[info_dict['mapName']][race_used] = 1
 
+
+	i += 1
+
+	if i % 50 == 0:
+		print(counter)
 
 	# if replay_data['info'].map_name != map_used:
 	# 	continue
