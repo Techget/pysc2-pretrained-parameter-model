@@ -81,7 +81,7 @@ writer = tf.summary.FileWriter('./log', sess.graph)     # write to file
 merge_op = tf.summary.merge_all() # operation to merge all summary
 
 bg = batchGenerator()
-for step in range(1000):                             # train
+for step in range(2000):                             # train
     m,s,u,a =  bg.next_batch()
 
     if step % 50 == 0:
