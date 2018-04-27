@@ -16,7 +16,7 @@ class batchGenerator(object):
 		
 		self.next_index_within_file = 0
 		self.winner_id_within_file = -1
-		self.BATCH_SIZE_LIMIT = 1000
+		self.BATCH_SIZE_LIMIT = 2000
 
 		self.dimension = 64
 		self.used_map = 'Abyssal Reef LE'
@@ -87,6 +87,7 @@ class batchGenerator(object):
 			winner_id = self.validation_winner_id
 
 		if self.next_index_within_file != 0:
+			# read in file at index of 'self.next_index - 1'
 			replay_data = pickle.load(open(self.parsed_directory+self.parsed_filenames[self.next_index-1], "rb"))
 			winner_id = self.winner_id_within_file
 

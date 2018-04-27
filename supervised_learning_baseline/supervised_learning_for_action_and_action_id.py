@@ -81,7 +81,7 @@ writer = tf.summary.FileWriter('./log', sess.graph)     # write to file
 merge_op = tf.summary.merge_all() # operation to merge all summary
 
 bg = batchGenerator()
-for step in range(2000):                             # train
+for step in range(5000):                             # train
     m,s,u,a =  bg.next_batch()
     _, loss_, result = sess.run([train_op, loss, merge_op],
         {minimap_placeholder: m, 
@@ -99,7 +99,7 @@ for step in range(2000):                             # train
         print('Step:', step,'| loss_: ', loss_, '| test accuracy: ', accuracy_)
 
     writer.add_summary(result, step)
-    print('~~~~~')
+    # print('~~~~~')
 
 saver.save(sess, './params', write_meta_graph=False)  # meta_graph is not recommended
 
