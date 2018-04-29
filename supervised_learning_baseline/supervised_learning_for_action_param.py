@@ -138,7 +138,7 @@ select_add_cross_entropy = tf.losses.sparse_softmax_cross_entropy(labels=arg_sel
     logits=select_add_output_logits)
 select_add_loss = tf.reduce_mean(select_add_cross_entropy)
 # select_unit_act
-select_unit_act_dense = tf.layers.desne(concat_input, 16, tf.nn.relu)
+select_unit_act_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 select_unit_act_logits = tf.layers.dense(select_unit_act_dense, 4) # enum, 4 output
 select_unit_act_pred = tf.nn.softmax(select_unit_act_logits, name="select_unit_act_pred")
 select_unit_act_cls = tf.argmax(select_unit_act_pred, dimension=1)
@@ -150,7 +150,7 @@ select_unit_id_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 select_unit_id_output = tf.layers.dense(select_unit_id_output_dense, 1)
 select_unit_id_loss = tf.square(select_unit_id_output - arg_select_unit_id_output)
 # select_worker
-select_worker_dense = tf.layers.desne(concat_input, 16, tf.nn.relu)
+select_worker_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 select_worker_logits = tf.layers.dense(select_worker_dense, 4) # enum, 4 output
 select_worker_pred = tf.nn.softmax(select_worker_logits, name="select_worker_pred")
 select_worker_cls = tf.argmax(select_worker_pred, dimension=1)
