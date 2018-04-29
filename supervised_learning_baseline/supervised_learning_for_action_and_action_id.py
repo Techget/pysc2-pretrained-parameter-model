@@ -72,9 +72,9 @@ input_to_classification = tf.concat([minimap_output, screen_output, avaliable_ac
 RNN_HIDDEN = 256+256+32+5
 lstm_layer = tf.nn.rnn_cell.BasicLSTMCell(RNN_HIDDEN, forget_bias=1, state_is_tuple=True)
 batch_size    = tf.shape(input_to_classification)[1]
-initial_state = cell.zero_state(batch_size, tf.float32)
+initial_state = lstm_layer.zero_state(batch_size, tf.float32)
 # outputs,_=rnn.static_rnn(lstm_layer,input,dtype="float32")
-rnn_outputs, rnn_states = tf.nn.dynamic_rnn(cell, input_to_classification, initial_state=initial_state, time_major=True)
+rnn_outputs, rnn_states = tf.nn.dynamic_rnn(lstm_layer, input_to_classification, initial_state=initial_state, time_major=True)
 
 input_to_classification = rnn_outputs
 
