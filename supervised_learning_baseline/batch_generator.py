@@ -277,11 +277,11 @@ class batchGenerator(object):
 				one_hot = np.zeros((1, 524)) # shape will be 1*254
 				one_hot[np.arange(1), [action[0]]] = 1
 
-				action_param_type = pysc2_actions.FUNCTION_TYPES[pysc2_actions.FUNCTIONS[action[0]].function_type]				
+				# action_param_type = pysc2_actions.FUNCTION_TYPES[pysc2_actions.FUNCTIONS[action[0]].function_type]
+				# action_param_type = str(action_param_type[0].name)
+				function_type = pysc2_actions.FUNCTIONS[action[0]].function_type.__name__
 
-				action_param_type = str(action_param_type[0].name)
-
-				if action_param_type=='no_op' or action_param_type=='autocast' or action_param_type=='select_larva':
+				if function_type=='no_op' or function_type=='autocast' or function_type=='select_larva':
 					continue
 
 				output_counter += 1
@@ -291,7 +291,7 @@ class batchGenerator(object):
 				action_output.append(one_hot[0])
 				player_info_output.append(pi_temp)
 				ground_truth_parameters.append(action[2])
-				function_types.append(action_param_type)
+				function_types.append(function_type)
 
 				if output_counter >= self.BATCH_SIZE_LIMIT:
 					break
