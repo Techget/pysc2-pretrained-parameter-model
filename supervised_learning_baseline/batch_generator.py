@@ -279,7 +279,7 @@ class batchGenerator(object):
 
 				action_param_type = pysc2_actions.FUNCTION_TYPES[pysc2_actions.FUNCTIONS[action[0]].function_type]				
 
-				action_param_type = action_param_type[0].name
+				action_param_type = str(action_param_type[0].name)
 
 				if action_param_type=='no_op' or action_param_type=='autocast' or action_param_type=='select_larva':
 					continue
