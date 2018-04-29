@@ -277,7 +277,7 @@ class batchGenerator(object):
 				one_hot = np.zeros((1, 524)) # shape will be 1*254
 				one_hot[np.arange(1), [action[0]]] = 1
 
-				action_param_type = pysc2.actions.FUNCTION_TYPES[pysc2_actions.FUNCTIONS[action[0]].function_type]				
+				action_param_type = pysc2_actions.FUNCTION_TYPES[pysc2_actions.FUNCTIONS[action[0]].function_type]				
 
 				if action_param_type=='no_op' or action_param_type=='autocast' or action_param_type=='select_larva':
 					continue
