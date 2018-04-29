@@ -200,7 +200,7 @@ class batchGenerator(object):
 		winner_id = -1
 
 		if get_validation_data != False:
-			replay_data = pickle.load(open(self.validate_file_path, "rb"))
+			replay_data = pickle.load(open(self.validation_file_name, "rb"))
 			winner_id = self.validation_winner_id
 
 		if self.next_index_within_file != 0:
@@ -278,6 +278,8 @@ class batchGenerator(object):
 				one_hot[np.arange(1), [action[0]]] = 1
 
 				action_param_type = pysc2_actions.FUNCTION_TYPES[pysc2_actions.FUNCTIONS[action[0]].function_type]				
+
+				action_param_type = action_param_type[0].name
 
 				if action_param_type=='no_op' or action_param_type=='autocast' or action_param_type=='select_larva':
 					continue
