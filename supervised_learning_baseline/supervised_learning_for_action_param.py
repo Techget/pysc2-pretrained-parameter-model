@@ -436,7 +436,7 @@ for step in range(5000):                             # train
             else:
                 print("unknown FUNCTION types !!")
 
-            total_loss += loss_
+            total_loss += loss_[0]
 
         writer.add_summary('loss_', total_loss)
         print('step: ', step, 'loss: ',total_loss) # , 'result: ', result
