@@ -18,19 +18,19 @@ action_placeholder = tf.placeholder(tf.float32, [None, 524]) # one hot
 # arg_placeholder = tf.placeholder(tf.float32, [None, None, None]) # then assign values in this placeholder to following placeholders
 
 # arg outputs placeholders
-arg_screen_replay_ouput = tf.placeholder_with_default([[0,0]], [None, 2], 'arg_screen_replay_ouput')
-arg_screen2_replay_ouput = tf.placeholder_with_default([[0,0]], [None, 2], 'arg_screen2_replay_ouput')
-arg_minimap_replay_ouput = tf.placeholder_with_default([[0,0]], [None, 2], 'arg_minimap_replay_ouput')
+arg_screen_replay_ouput = tf.placeholder_with_default([[0.0,0.0]], [None, 2], 'arg_screen_replay_ouput')
+arg_screen2_replay_ouput = tf.placeholder_with_default([[0.0,0.0]], [None, 2], 'arg_screen2_replay_ouput')
+arg_minimap_replay_ouput = tf.placeholder_with_default([[0.0,0.0]], [None, 2], 'arg_minimap_replay_ouput')
 arg_queued_replay_output = tf.placeholder_with_default([[0]], [None, 1], 'arg_queued_replay_output')
 arg_control_group_act_replay_output = tf.placeholder_with_default([[0]], [None, 1], 'arg_control_group_act_replay_output')
-arg_control_group_id_output = tf.placeholder_with_default([[0]], [None, 1], 'arg_control_group_id_output')
+arg_control_group_id_output = tf.placeholder_with_default([[0.0]], [None, 1], 'arg_control_group_id_output')
 arg_select_point_act_output = tf.placeholder_with_default([[0]], [None, 1], 'arg_select_point_act_output')
 arg_select_add_output = tf.placeholder_with_default([[0]], [None, 1], 'arg_select_add_output')
 arg_select_unit_act_output = tf.placeholder_with_default([[0]], [None, 1], 'arg_select_unit_act_output')
-arg_select_unit_id_output = tf.placeholder_with_default([[0]], [None, 1], 'arg_select_unit_id_output')
+arg_select_unit_id_output = tf.placeholder_with_default([[0.0]], [None, 1], 'arg_select_unit_id_output')
 arg_select_worker_output = tf.placeholder_with_default([[0]], [None, 1], 'arg_select_worker_output')
-arg_build_queue_id_output = tf.placeholder_with_default([[0]], [None, 1], 'arg_build_queue_id_output')
-arg_unload_id_output = tf.placeholder_with_default([[0]], [None, 1], 'arg_unload_id_output')
+arg_build_queue_id_output = tf.placeholder_with_default([[0.0]], [None, 1], 'arg_build_queue_id_output')
+arg_unload_id_output = tf.placeholder_with_default([[0.0]], [None, 1], 'arg_unload_id_output')
 
 # placeholder_default_value = {
 #     'arg_screen_replay_ouput': [[0,0]],
