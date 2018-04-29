@@ -68,6 +68,16 @@ user_info_output = tf.layers.dense(l1_user_info, 5)
 # regression, NOT SURE IF THIS IS suitable regression
 input_to_classification = tf.concat([minimap_output, screen_output, avaliable_actions_output, user_info_output], 1)
 
+# LSTM
+RNN_HIDDEN = 256+256+32+5
+lstm_layer = tf.nn.rnn_cell.BasicLSTMCell(RNN_HIDDEN, forget_bias=1, state_is_tuple=True)
+batch_size    = tf.shape(input_to_classification)[1]
+initial_state = cell.zero_state(batch_size, tf.float32)
+# outputs,_=rnn.static_rnn(lstm_layer,input,dtype="float32")
+rnn_outputs, rnn_states = tf.nn.dynamic_rnn(cell, input_to_classification, initial_state=initial_state, time_major=True)
+
+input_to_classification = rnn_outputs
+
 l2_classification = tf.layers.dense(input_to_classification, 1024, tf.nn.relu)
 classification_output = tf.layers.dense(l2_classification, 524)              # output layer
 loss = tf.losses.softmax_cross_entropy(onehot_labels=action_output, logits=classification_output)
