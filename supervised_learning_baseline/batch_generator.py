@@ -306,7 +306,7 @@ class batchGenerator(object):
 		if len(minimap_output) == 0:
 			# The replay file only record one person's operation, so if it is 
 			# the defeated person, we need to skip the replay file
-			return self.next_batch()
+			return self.next_batch_params()
 
 		return minimap_output, screen_output, action_output, player_info_output, ground_truth_parameters, function_types
 
