@@ -288,7 +288,7 @@ class batchGenerator(object):
 				screen_output.append(s_temp)
 				action_output.append(one_hot[0])
 				player_info_output.append(pi_temp)
-				ground_truth_parameters.append(param)
+				ground_truth_parameters.append(action[2])
 				function_types.append(action_param_type)
 
 				if output_counter >= self.BATCH_SIZE_LIMIT:
