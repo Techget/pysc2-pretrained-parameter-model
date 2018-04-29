@@ -430,7 +430,7 @@ for step in range(5000):                             # train
                     {minimap_placeholder: [m[i]], 
                     screen_placeholder: [s[i]], 
                     action_placeholder: [a[i]], 
-                    user_info_placeholder:[u[i2]], 
+                    user_info_placeholder:[u[i]], 
                     arg_queued_replay_output: [y[i][0]],
                     arg_minimap_replay_ouput: [y[i][1]]})
             else:
