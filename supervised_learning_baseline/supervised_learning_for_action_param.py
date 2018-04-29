@@ -18,19 +18,36 @@ action_placeholder = tf.placeholder(tf.float32, [None, 524]) # one hot
 # arg_placeholder = tf.placeholder(tf.float32, [None, None, None]) # then assign values in this placeholder to following placeholders
 
 # arg outputs placeholders
-arg_screen_replay_ouput = tf.placeholder(tf.float32, [None, 2])
-arg_screen2_replay_ouput = tf.placeholder(tf.float32, [None, 2])
-arg_minimap_replay_ouput = tf.placeholder(tf.float32, [None, 2])
-arg_queued_replay_output = tf.placeholder(tf.int32, [None, 1])
-arg_control_group_act_replay_output = tf.placeholder(tf.int32, [None, 1])
-arg_control_group_id_output = tf.placeholder(tf.float32, [None, 1])
-arg_select_point_act_output = tf.placeholder(tf.int32, [None, 1])
-arg_select_add_output = tf.placeholder(tf.int32, [None, 1])
-arg_select_unit_act_output = tf.placeholder(tf.int32, [None, 1])
-arg_select_unit_id_output = tf.placeholder(tf.float32, [None, 1])
-arg_select_worker_output = tf.placeholder(tf.int32, [None, 1])
-arg_build_queue_id_output = tf.placeholder(tf.float32, [None, 1])
-arg_unload_id_output = tf.placeholder(tf.float32, [None, 1])
+arg_screen_replay_ouput = tf.placeholder_with_default(tf.float32, [None, 2], 'arg_screen_replay_ouput')
+arg_screen2_replay_ouput = tf.placeholder_with_default(tf.float32, [None, 2], 'arg_screen2_replay_ouput')
+arg_minimap_replay_ouput = tf.placeholder_with_default(tf.float32, [None, 2], 'arg_minimap_replay_ouput')
+arg_queued_replay_output = tf.placeholder_with_default(tf.int32, [None, 1], 'arg_queued_replay_output')
+arg_control_group_act_replay_output = tf.placeholder_with_default(tf.int32, [None, 1], 'arg_control_group_act_replay_output')
+arg_control_group_id_output = tf.placeholder_with_default(tf.float32, [None, 1], 'arg_control_group_id_output')
+arg_select_point_act_output = tf.placeholder_with_default(tf.int32, [None, 1], 'arg_select_point_act_output')
+arg_select_add_output = tf.placeholder_with_default(tf.int32, [None, 1], 'arg_select_add_output')
+arg_select_unit_act_output = tf.placeholder_with_default(tf.int32, [None, 1], 'arg_select_unit_act_output')
+arg_select_unit_id_output = tf.placeholder_with_default(tf.float32, [None, 1], 'arg_select_unit_id_output')
+arg_select_worker_output = tf.placeholder_with_default(tf.int32, [None, 1], 'arg_select_worker_output')
+arg_build_queue_id_output = tf.placeholder_with_default(tf.float32, [None, 1], 'arg_build_queue_id_output')
+arg_unload_id_output = tf.placeholder_with_default(tf.float32, [None, 1], 'arg_unload_id_output')
+
+# placeholder_default_value = {
+#     'arg_screen_replay_ouput': [[0,0]],
+#     'arg_screen2_replay_ouput': [[0,0]],
+#     'arg_minimap_replay_ouput': [[0,0]],
+#     'arg_queued_replay_output': [[0]],
+#     'arg_control_group_act_replay_output': [[0]],
+#     'arg_control_group_id_output': [[1]],
+#     'arg_select_point_act_output': [[1]],
+#     'arg_select_add_output': [[0]],
+#     'arg_select_unit_act_output': [[0]],
+#     'arg_select_unit_id_output': [[0]],
+#     'arg_select_worker_output': [[0]],
+#     'arg_build_queue_id_output': [[0]],
+#     'arg_unload_id_output': [[0]]
+# }
+
 
 # minimap
 conv1_minimap = tf.layers.conv2d(   
@@ -187,7 +204,7 @@ Function_type_losses = {
 train_ops = {}
 for key, loss in Function_type_losses.items():
     train_ops[key] = tf.train.AdamOptimizer(LR).minimize(loss)
-    tf.summary.scalar(key+'_loss', loss)
+    # tf.summary.scalar(key+'_loss', loss)
 
 # regression_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 # # dropout_regression = tf.layers.dropout(
@@ -208,6 +225,19 @@ writer = tf.summary.FileWriter('./log', sess.graph)     # write to file
 merge_op = tf.summary.merge_all() # operation to merge all summary
 
 
+# arg_screen_replay_ouput: [[1,1]],
+# arg_screen2_replay_ouput: [[1,1]],
+# arg_queued_replay_output: [[0]],
+# arg_control_group_act_replay_output: [[0]],
+# arg_control_group_id_output: [[1]],
+# arg_select_point_act_output: [[0]],
+# arg_select_add_output: [[0]],
+# arg_select_unit_act_output: [[0]],
+# arg_select_unit_id_output: [[1]],
+# arg_select_worker_output: [[0]],
+# arg_build_queue_id_output: [[1]],
+# arg_unload_id_output:[[1]]
+
 bg = batchGenerator()
 for step in range(5000):                             # train
     m,s,a,u,y,ft =  bg.next_batch_params()
@@ -219,19 +249,7 @@ for step in range(5000):                             # train
                 screen_placeholder: [s[i]], 
                 action_placeholder: [a[i]], 
                 user_info_placeholder: [u[i]], 
-                arg_minimap_replay_ouput: [y[i][0]],
-                arg_screen_replay_ouput: [[1,1]],
-                arg_screen2_replay_ouput: [[1,1]],
-                arg_queued_replay_output: [[0]],
-                arg_control_group_act_replay_output: [[0]],
-                arg_control_group_id_output: [[1]],
-                arg_select_point_act_output: [[0]],
-                arg_select_add_output: [[0]],
-                arg_select_unit_act_output: [[0]],
-                arg_select_unit_id_output: [[1]],
-                arg_select_worker_output: [[0]],
-                arg_build_queue_id_output: [1],
-                arg_unload_id_output:[[1]]})
+                arg_minimap_replay_ouput: [y[i][0]]})
         elif ft[i] == 'select_point':
             _, loss_, result = sess.run([train_ops[ft[i]], Function_type_losses[ft[i]], merge_op],
                 {minimap_placeholder: [m[i]], 
@@ -425,7 +443,7 @@ for step in range(5000):                             # train
                     {minimap_placeholder: [m[i]], 
                     screen_placeholder: [s[i]], 
                     action_placeholder: [a[i]], 
-                    user_info_placeholder:[u[i]], 
+                    user_info_placeholder:[u[i2]], 
                     arg_queued_replay_output: [y[i][0]],
                     arg_minimap_replay_ouput: [y[i][1]]})
             else:
