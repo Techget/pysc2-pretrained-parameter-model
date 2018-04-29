@@ -187,7 +187,7 @@ Function_type_losses = {
 train_ops = {}
 for key, loss in Function_type_losses.items():
     train_ops[key] = tf.train.AdamOptimizer(LR).minimize(loss)
-
+    tf.summary.scalar(key+'_loss', loss)
 
 # regression_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 # # dropout_regression = tf.layers.dropout(
@@ -197,7 +197,9 @@ for key, loss in Function_type_losses.items():
 # # loss
 # loss = tf.reduce_mean(tf.square(regression_output - X_Y_ouput))
 # train_op = tf.train.GradientDescentOptimizer(0.001).minimize(loss)
-tf.summary.scalar('loss', loss) # add loss to scalar summary
+# tf.summary.scalar('loss', loss) # add loss to scalar summary
+# tf.summary.scalar('move_camera_loss', Function_type_losses['move_camera']) # add loss to scalar summary
+
 
 sess = tf.Session()                                 # control training and others
 sess.run(tf.global_variables_initializer())         # initialize var in graph
@@ -217,7 +219,19 @@ for step in range(5000):                             # train
                 screen_placeholder: [s[i]], 
                 action_placeholder: [a[i]], 
                 user_info_placeholder: [u[i]], 
-                arg_minimap_replay_ouput: [y[i][0]]})
+                arg_minimap_replay_ouput: [y[i][0]],
+                arg_screen_replay_ouput: [],
+                arg_screen2_replay_ouput: [],
+                arg_queued_replay_output: [],
+                arg_control_group_act_replay_output: [],
+                arg_control_group_id_output: [],
+                arg_select_point_act_output: [],
+                arg_select_add_output: [],
+                arg_select_unit_act_output: [],
+                arg_select_unit_id_output: [],
+                arg_select_worker_output: [],
+                arg_build_queue_id_output: [],
+                arg_unload_id_output:[]})
         elif ft[i] == 'select_point':
             _, loss_, result = sess.run([train_ops[ft[i]], Function_type_losses[ft[i]], merge_op],
                 {minimap_placeholder: [m[i]], 
