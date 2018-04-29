@@ -200,8 +200,13 @@ class batchGenerator(object):
 		winner_id = -1
 
 		if get_validation_data != False:
-			replay_data = pickle.load(open(self.validation_file_name, "rb"))
+			replay_data = pickle.load(open(self.validate_file_path, "rb"))
 			winner_id = self.validation_winner_id
+
+		if self.next_index_within_file != 0:
+			# read in file at index of 'self.next_index - 1'
+			replay_data = pickle.load(open(self.parsed_directory+self.parsed_filenames[self.next_index-1], "rb"))
+			winner_id = self.winner_id_within_file
 
 		while replay_data == []:
 			full_filename = self.parsed_directory+self.parsed_filenames[self.next_index]
@@ -240,9 +245,12 @@ class batchGenerator(object):
 		screen_output = []
 		action_output = []
 		player_info_output = []
-
 		ground_truth_parameters = []
+		function_types = []
 
+
+		output_counter = 0
+		self.winner_id_within_file = winner_id
 		for state in replay_data['state']:
 			if state['actions'] == []:
 				continue
@@ -274,6 +282,7 @@ class batchGenerator(object):
 				if action_param_type=='no_op' or action_param_type=='autocast' or action_param_type=='select_larva':
 					continue
 
+				output_counter += 1
 				# for param in action[2]:
 				minimap_output.append(m_temp)
 				screen_output.append(s_temp)
@@ -281,6 +290,14 @@ class batchGenerator(object):
 				player_info_output.append(pi_temp)
 				ground_truth_parameters.append(param)
 				function_types.append(action_param_type)
+
+				if output_counter >= self.BATCH_SIZE_LIMIT:
+					break
+
+			if output_counter < self.BATCH_SIZE_LIMIT:
+				# means finishing reading the current file
+				self.next_index_within_file = 0
+				self.winner_id_within_file = -1
 
 		assert(len(minimap_output) == len(ground_truth_parameters))
 

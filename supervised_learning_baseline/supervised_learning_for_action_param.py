@@ -5,7 +5,6 @@ import pysc2.lib.actions as pysc2_actions
 
 LR = 0.0001
 
-
 minimap_placeholder = tf.placeholder(tf.float32, [None, 64, 64, 5])
 screen_placeholder = tf.placeholder(tf.float32, [None, 64, 64, 10])
 user_info_placeholder = tf.placeholder(tf.float32, [None, 11])
@@ -16,7 +15,7 @@ action_placeholder = tf.placeholder(tf.float32, [None, 524]) # one hot
 #     [[0],[1, 2]],
 #     [[1],[5]], ...
 # ]
-arg_placeholder = tf.placeholder(tf.float32, [None, None, None]) # then assign values in this placeholder to following placeholders
+# arg_placeholder = tf.placeholder(tf.float32, [None, None, None]) # then assign values in this placeholder to following placeholders
 
 # arg outputs placeholders
 arg_screen_replay_ouput = tf.placeholder(tf.float32, [None, 2])
@@ -185,17 +184,19 @@ Function_type_losses = {
 }
 
 
+train_ops = {}
+for key, loss in Function_type_losses.items():
+    train_ops[key] = tf.train.AdamOptimizer(LR).minimize(loss)
 
 
+# regression_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
+# # dropout_regression = tf.layers.dropout(
+# #     inputs=dense_screen, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
+# regression_output = tf.layers.dense(regression_dense, 2)
 
-regression_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
-# dropout_regression = tf.layers.dropout(
-#     inputs=dense_screen, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
-regression_output = tf.layers.dense(regression_dense, 2)
-
-# loss
-loss = tf.reduce_mean(tf.square(regression_output - X_Y_ouput))
-train_op = tf.train.GradientDescentOptimizer(0.001).minimize(loss)
+# # loss
+# loss = tf.reduce_mean(tf.square(regression_output - X_Y_ouput))
+# train_op = tf.train.GradientDescentOptimizer(0.001).minimize(loss)
 tf.summary.scalar('loss', loss) # add loss to scalar summary
 
 sess = tf.Session()                                 # control training and others
@@ -206,16 +207,218 @@ merge_op = tf.summary.merge_all() # operation to merge all summary
 
 
 bg = batchGenerator()
-for step in range(1000):                             # train
+for step in range(5000):                             # train
     m,s,a,u,y,ft =  bg.next_batch_params()
-    _, loss_, result = sess.run([train_op, loss, merge_op],
-        {minimap_placeholder: m, 
-        screen_placeholder: s, 
-        action_placeholder: a, 
-        user_info_placeholder:u, 
-        X_Y_ouput:y})
+
+    for i in range(0, len(ft)):
+        if ft[i] == 'move_camera':
+            _, loss_, result = sess.run([train_ops[ft[i]], Function_type_losses[ft[i]], merge_op],
+                {minimap_placeholder: m[i], 
+                screen_placeholder: s[i], 
+                action_placeholder: a[i], 
+                user_info_placeholder:u[i], 
+                arg_minimap_replay_ouput:y[i][0]})
+        elif ft[i] == 'select_point':
+            _, loss_, result = sess.run([train_ops[ft[i]], Function_type_losses[ft[i]], merge_op],
+                {minimap_placeholder: m[i], 
+                screen_placeholder: s[i], 
+                action_placeholder: a[i], 
+                user_info_placeholder:u[i], 
+                arg_select_point_act_output: y[i][0],
+                arg_screen_replay_ouput: y[i][1]})
+        elif ft[i] == 'select_rect':
+            _, loss_, result = sess.run([train_ops[ft[i]], Function_type_losses[ft[i]], merge_op],
+                {minimap_placeholder: m[i], 
+                screen_placeholder: s[i], 
+                action_placeholder: a[i], 
+                user_info_placeholder:u[i], 
+                arg_select_add_output: y[i][0],
+                arg_screen_replay_ouput: y[i][1],
+                arg_screen2_replay_ouput: y[i][2]})
+        elif ft[i] == 'select_unit':
+            _, loss_, result = sess.run([train_ops[ft[i]], Function_type_losses[ft[i]], merge_op],
+                {minimap_placeholder: m[i], 
+                screen_placeholder: s[i], 
+                action_placeholder: a[i], 
+                user_info_placeholder:u[i], 
+                arg_select_unit_act_output: y[i][0],
+                arg_select_unit_id_output: y[i][1]})
+        elif ft[i] == 'control_group':
+            _, loss_, result = sess.run([train_ops[ft[i]], Function_type_losses[ft[i]], merge_op],
+                {minimap_placeholder: m[i], 
+                screen_placeholder: s[i], 
+                action_placeholder: a[i], 
+                user_info_placeholder:u[i], 
+                arg_control_group_act_replay_output: y[i][0],
+                arg_control_group_id_output: y[i][1]})
+        elif ft[i] == 'select_idle_worker':
+            _, loss_, result = sess.run([train_ops[ft[i]], Function_type_losses[ft[i]], merge_op],
+                {minimap_placeholder: m[i], 
+                screen_placeholder: s[i], 
+                action_placeholder: a[i], 
+                user_info_placeholder:u[i], 
+                arg_select_worker_output: y[i][0]})
+        elif ft[i] == 'select_army':
+            _, loss_, result = sess.run([train_ops[ft[i]], Function_type_losses[ft[i]], merge_op],
+                {minimap_placeholder: m[i], 
+                screen_placeholder: s[i], 
+                action_placeholder: a[i], 
+                user_info_placeholder:u[i], 
+                arg_select_add_output: y[i][0]})
+        elif ft[i] == 'select_warp_gates':
+             _, loss_, result = sess.run([train_ops[ft[i]], Function_type_losses[ft[i]], merge_op],
+                {minimap_placeholder: m[i], 
+                screen_placeholder: s[i], 
+                action_placeholder: a[i], 
+                user_info_placeholder:u[i], 
+                arg_select_add_output: y[i][0]})
+        elif ft[i] == 'unload':
+            _, loss_, result = sess.run([train_ops[ft[i]], Function_type_losses[ft[i]], merge_op],
+                {minimap_placeholder: m[i], 
+                screen_placeholder: s[i], 
+                action_placeholder: a[i], 
+                user_info_placeholder:u[i], 
+                arg_unload_id_output: y[i][0]})
+        elif ft[i] == 'build_queue':
+            _, loss_, result = sess.run([train_ops[ft[i]], Function_type_losses[ft[i]], merge_op],
+                {minimap_placeholder: m[i], 
+                screen_placeholder: s[i], 
+                action_placeholder: a[i], 
+                user_info_placeholder:u[i], 
+                arg_build_queue_id_output: y[i][0]})
+        elif ft[i] == 'cmd_quick':
+            _, loss_, result = sess.run([train_ops[ft[i]], Function_type_losses[ft[i]], merge_op],
+                {minimap_placeholder: m[i], 
+                screen_placeholder: s[i], 
+                action_placeholder: a[i], 
+                user_info_placeholder:u[i], 
+                arg_queued_replay_output: y[i][0]})
+        elif ft[i] == 'cmd_screen':
+            _, loss_, result = sess.run([train_ops[ft[i]], Function_type_losses[ft[i]], merge_op],
+                {minimap_placeholder: m[i], 
+                screen_placeholder: s[i], 
+                action_placeholder: a[i], 
+                user_info_placeholder:u[i], 
+                arg_queued_replay_output: y[i][0],
+                arg_screen_replay_ouput: y[i][1]})
+        elif ft[i] == 'cmd_minimap':
+            _, loss_, result = sess.run([train_ops[ft[i]], Function_type_losses[ft[i]], merge_op],
+                {minimap_placeholder: m[i], 
+                screen_placeholder: s[i], 
+                action_placeholder: a[i], 
+                user_info_placeholder:u[i], 
+                arg_queued_replay_output: y[i][0],
+                arg_minimap_replay_ouput: y[i][1]})
+        else:
+            print("unknown FUNCTION types !!")        
 
     if step % 50 == 0:
+        m,s,a,u,y,ft =  bg.next_batch_params(get_validation_data=True)
+        total_loss = 0
+        for i in range(0, len(ft)):
+            if ft[i] == 'move_camera':
+                loss_, result = sess.run([Function_type_losses[ft[i]], merge_op],
+                    {minimap_placeholder: m[i], 
+                    screen_placeholder: s[i], 
+                    action_placeholder: a[i], 
+                    user_info_placeholder:u[i], 
+                    arg_minimap_replay_ouput:y[i][0]})
+            elif ft[i] == 'select_point':
+                loss_, result = sess.run([Function_type_losses[ft[i]], merge_op],
+                    {minimap_placeholder: m[i], 
+                    screen_placeholder: s[i], 
+                    action_placeholder: a[i], 
+                    user_info_placeholder:u[i], 
+                    arg_select_point_act_output: y[i][0],
+                    arg_screen_replay_ouput: y[i][1]})
+            elif ft[i] == 'select_rect':
+                loss_, result = sess.run([Function_type_losses[ft[i]], merge_op],
+                    {minimap_placeholder: m[i], 
+                    screen_placeholder: s[i], 
+                    action_placeholder: a[i], 
+                    user_info_placeholder:u[i], 
+                    arg_select_add_output: y[i][0],
+                    arg_screen_replay_ouput: y[i][1],
+                    arg_screen2_replay_ouput: y[i][2]})
+            elif ft[i] == 'select_unit':
+                loss_, result = sess.run([Function_type_losses[ft[i]], merge_op],
+                    {minimap_placeholder: m[i], 
+                    screen_placeholder: s[i], 
+                    action_placeholder: a[i], 
+                    user_info_placeholder:u[i], 
+                    arg_select_unit_act_output: y[i][0],
+                    arg_select_unit_id_output: y[i][1]})
+            elif ft[i] == 'control_group':
+                loss_, result = sess.run([Function_type_losses[ft[i]], merge_op],
+                    {minimap_placeholder: m[i], 
+                    screen_placeholder: s[i], 
+                    action_placeholder: a[i], 
+                    user_info_placeholder:u[i], 
+                    arg_control_group_act_replay_output: y[i][0],
+                    arg_control_group_id_output: y[i][1]})
+            elif ft[i] == 'select_idle_worker':
+                loss_, result = sess.run([Function_type_losses[ft[i]], merge_op],
+                    {minimap_placeholder: m[i], 
+                    screen_placeholder: s[i], 
+                    action_placeholder: a[i], 
+                    user_info_placeholder:u[i], 
+                    arg_select_worker_output: y[i][0]})
+            elif ft[i] == 'select_army':
+                loss_, result = sess.run([Function_type_losses[ft[i]], merge_op],
+                    {minimap_placeholder: m[i], 
+                    screen_placeholder: s[i], 
+                    action_placeholder: a[i], 
+                    user_info_placeholder:u[i], 
+                    arg_select_add_output: y[i][0]})
+            elif ft[i] == 'select_warp_gates':
+                loss_, result = sess.run([Function_type_losses[ft[i]], merge_op],
+                    {minimap_placeholder: m[i], 
+                    screen_placeholder: s[i], 
+                    action_placeholder: a[i], 
+                    user_info_placeholder:u[i], 
+                    arg_select_add_output: y[i][0]})
+            elif ft[i] == 'unload':
+                loss_, result = sess.run([Function_type_losses[ft[i]], merge_op],
+                    {minimap_placeholder: m[i], 
+                    screen_placeholder: s[i], 
+                    action_placeholder: a[i], 
+                    user_info_placeholder:u[i], 
+                    arg_unload_id_output: y[i][0]})
+            elif ft[i] == 'build_queue':
+                loss_, result = sess.run([Function_type_losses[ft[i]], merge_op],
+                    {minimap_placeholder: m[i], 
+                    screen_placeholder: s[i], 
+                    action_placeholder: a[i], 
+                    user_info_placeholder:u[i], 
+                    arg_build_queue_id_output: y[i][0]})
+            elif ft[i] == 'cmd_quick':
+                loss_, result = sess.run([Function_type_losses[ft[i]], merge_op],
+                    {minimap_placeholder: m[i], 
+                    screen_placeholder: s[i], 
+                    action_placeholder: a[i], 
+                    user_info_placeholder:u[i], 
+                    arg_queued_replay_output: y[i][0]})
+            elif ft[i] == 'cmd_screen':
+                loss_, result = sess.run([Function_type_losses[ft[i]], merge_op],
+                    {minimap_placeholder: m[i], 
+                    screen_placeholder: s[i], 
+                    action_placeholder: a[i], 
+                    user_info_placeholder:u[i], 
+                    arg_queued_replay_output: y[i][0],
+                    arg_screen_replay_ouput: y[i][1]})
+            elif ft[i] == 'cmd_minimap':
+                loss_, result = sess.run([Function_type_losses[ft[i]], merge_op],
+                    {minimap_placeholder: m[i], 
+                    screen_placeholder: s[i], 
+                    action_placeholder: a[i], 
+                    user_info_placeholder:u[i], 
+                    arg_queued_replay_output: y[i][0],
+                    arg_minimap_replay_ouput: y[i][1]})
+            else:
+                print("unknown FUNCTION types !!")
+
+            total_loss += loss_
+
         writer.add_summary(result, step)
         print('step: ', step, 'loss: ',loss_, 'result: ', result)
 
