@@ -438,7 +438,7 @@ for step in range(5000):                             # train
 
             total_loss += loss_[0]
 
-        writer.add_summary('loss_', total_loss)
+        writer.add_summary(total_loss, step)
         print('step: ', step, 'loss: ',total_loss) # , 'result: ', result
 
 saver.save(sess, './params', write_meta_graph=False)  # meta_graph is not recommended
