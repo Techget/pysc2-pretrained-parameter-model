@@ -213,28 +213,28 @@ for step in range(5000):                             # train
     for i in range(0, len(ft)):
         if ft[i] == 'move_camera':
             _, loss_, result = sess.run([train_ops[ft[i]], Function_type_losses[ft[i]], merge_op],
-                {minimap_placeholder: m[i], 
-                screen_placeholder: s[i], 
-                action_placeholder: a[i], 
-                user_info_placeholder:u[i], 
-                arg_minimap_replay_ouput:y[i][0]})
+                {minimap_placeholder: [m[i]], 
+                screen_placeholder: [s[i]], 
+                action_placeholder: [a[i]], 
+                user_info_placeholder: [u[i]], 
+                arg_minimap_replay_ouput: [y[i][0]]})
         elif ft[i] == 'select_point':
             _, loss_, result = sess.run([train_ops[ft[i]], Function_type_losses[ft[i]], merge_op],
-                {minimap_placeholder: m[i], 
-                screen_placeholder: s[i], 
-                action_placeholder: a[i], 
-                user_info_placeholder:u[i], 
-                arg_select_point_act_output: y[i][0],
-                arg_screen_replay_ouput: y[i][1]})
+                {minimap_placeholder: [m[i]], 
+                screen_placeholder: [s[i]], 
+                action_placeholder: [a[i]], 
+                user_info_placeholder: [u[i]], 
+                arg_select_point_act_output: [y[i][0]],
+                arg_screen_replay_ouput: [y[i][1]]})
         elif ft[i] == 'select_rect':
             _, loss_, result = sess.run([train_ops[ft[i]], Function_type_losses[ft[i]], merge_op],
-                {minimap_placeholder: m[i], 
-                screen_placeholder: s[i], 
-                action_placeholder: a[i], 
-                user_info_placeholder:u[i], 
-                arg_select_add_output: y[i][0],
-                arg_screen_replay_ouput: y[i][1],
-                arg_screen2_replay_ouput: y[i][2]})
+                {minimap_placeholder: [m[i]], 
+                screen_placeholder: [s[i]], 
+                action_placeholder: [a[i]], 
+                user_info_placeholder: [u[i]], 
+                arg_select_add_output: [y[i][0]],
+                arg_screen_replay_ouput: [y[i][1]],
+                arg_screen2_replay_ouput: [y[i][2]]})
         elif ft[i] == 'select_unit':
             _, loss_, result = sess.run([train_ops[ft[i]], Function_type_losses[ft[i]], merge_op],
                 {minimap_placeholder: m[i], 
