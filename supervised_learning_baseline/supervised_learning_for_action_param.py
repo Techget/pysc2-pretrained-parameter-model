@@ -122,7 +122,7 @@ control_group_id_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 control_group_id_output = tf.layers.dense(control_group_id_output_dense, 1)
 control_group_id_loss = tf.square(control_group_id_output - arg_control_group_id_output)
 # select_point_act
-select_point_act_dense = tf.layers.desne(concat_input, 16, tf.nn.relu)
+select_point_act_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 select_point_act_logits = tf.layers.dense(select_point_act_dense, 4) # enum, 4 output
 select_point_act_pred = tf.nn.softmax(select_point_act_logits, name="select_point_act_pred")
 select_point_act_cls = tf.argmax(select_point_act_pred, dimension=1)
