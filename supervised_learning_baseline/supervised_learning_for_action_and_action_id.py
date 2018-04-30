@@ -74,9 +74,9 @@ HIDDEN_SIZE = 512
 KEEP_PROB = 0.7
 LAYER_NUM = 2
 input_to_rnn = tf.reshape(input_to_classification, [-1, 24, 24])
-lstm_cell = tf.contrib.rnn.BasicLSTMCell(num_units=HIDDEN_SIZE, forget_bias=1.0, state_is_tuple=True)
-lstm_cell = tf.contrib.rnn.DropoutWrapper(cell=lstm_cell, input_keep_prob=1.0, output_keep_prob=KEEP_PROB)
-mlstm_cell = tf.contrib.rnn.MultiRNNCell([lstm_cell] * LAYER_NUM, state_is_tuple=True)
+lstm_cell = tf.nn.rnn.BasicLSTMCell(num_units=HIDDEN_SIZE, forget_bias=1.0, state_is_tuple=True)
+lstm_cell = tf.nn.rnn.DropoutWrapper(cell=lstm_cell, input_keep_prob=1.0, output_keep_prob=KEEP_PROB)
+mlstm_cell = tf.nn.rnn.MultiRNNCell([lstm_cell] * LAYER_NUM, state_is_tuple=True)
 batch_size = tf.shape(input_to_rnn)[0]
 init_state = mlstm_cell.zero_state(batch_size, dtype=tf.float32)
 rnn_outputs, rnn_state = tf.nn.dynamic_rnn(mlstm_cell, inputs=input_to_rnn, initial_state=init_state, time_major=False)
@@ -87,7 +87,6 @@ input_to_classification = rnn_state[-1][1] # shape is [batch_size, HIDDEN_SIZE]
 # initial_state = lstm_layer.zero_state(batch_size, tf.float32)
 # # outputs,_=rnn.static_rnn(lstm_layer,input,dtype="float32")
 # rnn_outputs, rnn_states = tf.nn.dynamic_rnn(lstm_layer, input_to_classification, initial_state=initial_state, time_major=True)
-
 # input_to_classification = rnn_outputs
 
 l2_classification = tf.layers.dense(input_to_classification, 1024, tf.nn.relu)
