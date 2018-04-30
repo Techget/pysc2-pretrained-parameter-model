@@ -32,23 +32,6 @@ arg_select_worker_output = tf.placeholder_with_default([[0]], [None, 1], 'arg_se
 arg_build_queue_id_output = tf.placeholder_with_default([[0.0]], [None, 1], 'arg_build_queue_id_output')
 arg_unload_id_output = tf.placeholder_with_default([[0.0]], [None, 1], 'arg_unload_id_output')
 
-# placeholder_default_value = {
-#     'arg_screen_replay_ouput': [[0,0]],
-#     'arg_screen2_replay_ouput': [[0,0]],
-#     'arg_minimap_replay_ouput': [[0,0]],
-#     'arg_queued_replay_output': [[0]],
-#     'arg_control_group_act_replay_output': [[0]],
-#     'arg_control_group_id_output': [[1]],
-#     'arg_select_point_act_output': [[1]],
-#     'arg_select_add_output': [[0]],
-#     'arg_select_unit_act_output': [[0]],
-#     'arg_select_unit_id_output': [[0]],
-#     'arg_select_worker_output': [[0]],
-#     'arg_build_queue_id_output': [[0]],
-#     'arg_unload_id_output': [[0]]
-# }
-
-
 # minimap
 conv1_minimap = tf.layers.conv2d(   
     inputs=minimap_placeholder,
@@ -94,9 +77,12 @@ dense_screen = tf.layers.dense(inputs=flat_screen, units=1024, activation=tf.nn.
 screen_output = tf.layers.dense(dense_screen, 64)
 
 # action id
-l1_action = tf.layers.dense(action_placeholder, 128, tf.nn.relu)          # hidden layer
-l2_action = tf.layers.dense(l1_action, 64, tf.nn.relu)
-action_output = tf.layers.dense(l2_action, 10) # output layer
+HIDDEN_SIZE = 524
+action_lstm_cell = tf.nn.rnn_cell.BasicLSTMCell(num_units=HIDDEN_SIZE, forget_bias=1.0, state_is_tuple=True)
+rnn_outputs,rnn_state=rnn.static_rnn(action_lstm_cell,action_placeholder,dtype=tf.float32)
+l1_action = tf.layers.dense(rnn_state[-1], 128, tf.nn.relu)          # hidden layer
+action_output = tf.layers.dense(l1_action, 32)
+#action_output = tf.layers.dense(l2_action, 10) # output layer
 
 # user info
 l1_user_info = tf.layers.dense(user_info_placeholder, 11, tf.tanh)
