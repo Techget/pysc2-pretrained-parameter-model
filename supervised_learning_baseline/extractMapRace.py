@@ -2,6 +2,9 @@ import os
 from os.path import expanduser
 import shutil
 import pickle
+from tqdm import tqdm
+from google.protobuf.json_format import MessageToJson
+import json
 
 # map_used = "Odyssey LE"
 # race_used = "Terran"
