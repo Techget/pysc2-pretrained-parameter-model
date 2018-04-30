@@ -58,25 +58,37 @@ screen_output = tf.layers.dense(dense_screen, 256)
 
 # avaliable actions
 l1_available_actions = tf.layers.dense(available_action_placeholder, 128, tf.nn.relu)
-avaliable_actions_output = tf.layers.dense(l1_available_actions, 32, tf.nn.relu)
+avaliable_actions_output = tf.layers.dense(l1_available_actions, 60, tf.nn.relu)
 
 # user info
 l1_user_info = tf.layers.dense(user_info_placeholder, 11, tf.tanh)
-user_info_output = tf.layers.dense(l1_user_info, 5)
+user_info_output = tf.layers.dense(l1_user_info, 4)
 
 
 # regression, NOT SURE IF THIS IS suitable regression
 input_to_classification = tf.concat([minimap_output, screen_output, avaliable_actions_output, user_info_output], 1)
 
 # LSTM
-RNN_HIDDEN = 256+256+32+5
-lstm_layer = tf.nn.rnn_cell.BasicLSTMCell(RNN_HIDDEN, forget_bias=1, state_is_tuple=True)
-batch_size    = tf.shape(input_to_classification)[1]
-initial_state = lstm_layer.zero_state(batch_size, tf.float32)
-# outputs,_=rnn.static_rnn(lstm_layer,input,dtype="float32")
-rnn_outputs, rnn_states = tf.nn.dynamic_rnn(lstm_layer, input_to_classification, initial_state=initial_state, time_major=True)
+# RNN_HIDDEN = 256+256+60+4 # 576 = 24 * 24
+HIDDEN_SIZE = 512
+KEEP_PROB = 0.7
+LAYER_NUM = 2
+input_to_rnn = tf.reshape(input_to_classification, [-1, 24, 24])
+lstm_cell = rnn.BasicLSTMCell(num_units=HIDDEN_SIZE, forget_bias=1.0, state_is_tuple=True)
+lstm_cell = rnn.DropoutWrapper(cell=lstm_cell, input_keep_prob=1.0, output_keep_prob=KEEP_PROB)
+mlstm_cell = rnn.MultiRNNCell([lstm_cell] * LAYER_NUM, state_is_tuple=True)
+batch_size = tf.shape(input_to_rnn)[0]
+init_state = mlstm_cell.zero_state(batch_size, dtype=tf.float32)
+rnn_outputs, rnn_state = tf.nn.dynamic_rnn(mlstm_cell, inputs=input_to_rnn, initial_state=init_state, time_major=False)
+input_to_classification = rnn_state[-1][1] # shape is [batch_size, HIDDEN_SIZE]
 
-input_to_classification = rnn_outputs
+# lstm_layer = tf.nn.rnn_cell.BasicLSTMCell(RNN_HIDDEN, forget_bias=1, state_is_tuple=True)
+# batch_size    = tf.shape(input_to_classification)[1]
+# initial_state = lstm_layer.zero_state(batch_size, tf.float32)
+# # outputs,_=rnn.static_rnn(lstm_layer,input,dtype="float32")
+# rnn_outputs, rnn_states = tf.nn.dynamic_rnn(lstm_layer, input_to_classification, initial_state=initial_state, time_major=True)
+
+# input_to_classification = rnn_outputs
 
 l2_classification = tf.layers.dense(input_to_classification, 1024, tf.nn.relu)
 classification_output = tf.layers.dense(l2_classification, 524)              # output layer
@@ -127,7 +139,7 @@ for step in range(5000):                             # train
     writer.add_summary(result, step)
     # print('~~~~~')
 
-saver.save(sess, './params', write_meta_graph=False)  # meta_graph is not recommended
+saver.save(sess, './action_id')  # meta_graph is not recommended, , write_meta_graph=False
 
 
 

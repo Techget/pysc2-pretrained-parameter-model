@@ -441,7 +441,7 @@ for step in range(5000):                             # train
         # writer.add_summary(total_loss, step)
         print('step: ', step, 'loss: ',total_loss) # , 'result: ', result
 
-saver.save(sess, './params', write_meta_graph=False)  # meta_graph is not recommended
+saver.save(sess, './action_params')  # meta_graph is not recommended, write_meta_graph=False
 
 
 
