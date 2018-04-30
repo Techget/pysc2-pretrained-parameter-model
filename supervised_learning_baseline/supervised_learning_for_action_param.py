@@ -74,19 +74,22 @@ flat_screen = tf.reshape(pool2_screen, [-1, 16*16*32])          # -> (16*16*32, 
 dense_screen = tf.layers.dense(inputs=flat_screen, units=1024, activation=tf.nn.relu)
 # dropout_screen = tf.layers.dropout(
 #     inputs=dense_screen, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
-screen_output = tf.layers.dense(dense_screen, 64)
+screen_output = tf.layers.dense(dense_screen, 64, tf.nn.relu)
 
 # action id
 HIDDEN_SIZE = 524
+l1_action = tf.layers.dense(action_placeholder, 256, tf.nn.relu)
+input_to_rnn = tf.reshape(l1_action, [-1, 16, 16])
 action_lstm_cell = tf.nn.rnn_cell.BasicLSTMCell(num_units=HIDDEN_SIZE, forget_bias=1.0, state_is_tuple=True)
-rnn_outputs,rnn_state= tf.contrib.rnn.static_rnn(action_lstm_cell,action_placeholder,dtype=tf.float32)
-l1_action = tf.layers.dense(rnn_state[-1], 128, tf.nn.relu)          # hidden layer
-action_output = tf.layers.dense(l1_action, 32)
+inputs_rnn = tf.unstack(input_to_rnn, num=16, axis=1)
+rnn_outputs,rnn_state= tf.contrib.rnn.static_rnn(action_lstm_cell,inputs_rnn,dtype=tf.float32)
+l2_action = tf.layers.dense(rnn_state[-1], 128, tf.nn.relu)          # hidden layer
+action_output = tf.layers.dense(l2_action, 32, tf.nn.relu)
 #action_output = tf.layers.dense(l2_action, 10) # output layer
 
 # user info
-l1_user_info = tf.layers.dense(user_info_placeholder, 11, tf.tanh)
-user_info_output = tf.layers.dense(l1_user_info, 5)
+l1_user_info = tf.layers.dense(user_info_placeholder, 11, tf.nn.relu)
+user_info_output = tf.layers.dense(l1_user_info, 5, tf.nn.relu)
 
 # processed concatenated input
 concat_input = tf.concat([minimap_output, screen_output, action_output, user_info_output], 1)
