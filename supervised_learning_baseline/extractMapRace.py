@@ -3,32 +3,40 @@ from os.path import expanduser
 import shutil
 import pickle
 
-map_used = "Odyssey LE"
-race_used = "Terran"
+# map_used = "Odyssey LE"
+# race_used = "Terran"
 home_dir = expanduser("~")
 home_dir += '/'
-parsed_directory = home_dir+'pysc2-replay/data_64/'
-extracted_directory = home_dir+'pysc2-replay/data_'+map_used+'_'+race_used+'/'
+parsed_directory = home_dir+'pysc2-replay/data_full/'
+extracted_directory_base = home_dir+'pysc2-replay/map_race_data/'
+# extracted_directory = home_dir+'pysc2-replay/data_'+map_used+'_'+race_used+'/'
 
 
-for fn in os.listdir(parsed_directory):
+if not os.path.exists(extracted_directory_base):
+	os.mkdir(extracted_directory_base)
+
+for fn in tqdm(os.listdir(parsed_directory)):
 	full_filename = parsed_directory+fn
-	replay_data = pickle.load(open(full_filename, "rb"))
+	temp_dir = extracted_directory_base
 
-	if replay_data['info'].map_name != map_used:
+	try:
+		replay_data = pickle.load(open(full_filename, "rb"))
+	except:
 		continue
+	
+	loaded_replay_info_json = MessageToJson(replay_data['info'])
+	info_dict = json.loads(loaded_replay_info_json)
 
-	outer_loop_coutinue = False
-	for pi in replay_data['info'].player_info:
-		if pi.player_info.race_actaul != race_used:
-			outer_loop_coutinue = True
-			break
-	if outer_loop_coutinue == True:
-		continue
+	temp_dir += info_dict['mapName']+'_'+info_dict['playerInfo'][0]['playerInfo']['raceActual']+'_'+info_dict['playerInfo'][1]['playerInfo']['raceActual']
+	temp_dir += '/'
 
-	shutil.copyfile(parsed_directory+fn, extracted_directory+fn)
+	if not os.path.exists(temp_dir):
+		os.mkdir(temp_dir)
 
-
-
+	shutil.move(parsed_directory+fn, temp_dir+fn)
 
 
+
+# shutil.move(src, dst, copy_function=copy2)
+# os.mkdir()
+# os.path.exists(path)
