@@ -74,8 +74,8 @@ HIDDEN_SIZE = 512
 KEEP_PROB = 0.7
 LAYER_NUM = 2
 input_to_rnn = tf.reshape(input_to_classification, [-1, 24, 24])
-lstm_cell = tf.nn.rnn.BasicLSTMCell(num_units=HIDDEN_SIZE, forget_bias=1.0, state_is_tuple=True)
-lstm_cell = tf.nn.rnn.DropoutWrapper(cell=lstm_cell, input_keep_prob=1.0, output_keep_prob=KEEP_PROB)
+lstm_cell = tf.nn.rnn_cell.BasicLSTMCell(num_units=HIDDEN_SIZE, forget_bias=1.0, state_is_tuple=True)
+lstm_cell = tf.contrib.rnn.DropoutWrapper(cell=lstm_cell, input_keep_prob=1.0, output_keep_prob=KEEP_PROB)
 mlstm_cell = tf.nn.rnn.MultiRNNCell([lstm_cell] * LAYER_NUM, state_is_tuple=True)
 batch_size = tf.shape(input_to_rnn)[0]
 init_state = mlstm_cell.zero_state(batch_size, dtype=tf.float32)
