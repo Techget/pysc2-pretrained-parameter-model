@@ -79,7 +79,7 @@ screen_output = tf.layers.dense(dense_screen, 64)
 # action id
 HIDDEN_SIZE = 524
 action_lstm_cell = tf.nn.rnn_cell.BasicLSTMCell(num_units=HIDDEN_SIZE, forget_bias=1.0, state_is_tuple=True)
-rnn_outputs,rnn_state=rnn.static_rnn(action_lstm_cell,action_placeholder,dtype=tf.float32)
+rnn_outputs,rnn_state= tf.contrib.rnn.static_rnn(action_lstm_cell,action_placeholder,dtype=tf.float32)
 l1_action = tf.layers.dense(rnn_state[-1], 128, tf.nn.relu)          # hidden layer
 action_output = tf.layers.dense(l1_action, 32)
 #action_output = tf.layers.dense(l2_action, 10) # output layer
