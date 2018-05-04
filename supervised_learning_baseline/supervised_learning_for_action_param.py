@@ -430,6 +430,9 @@ for step in range(5000):                             # train
         # writer.add_summary(total_loss, step)
         print('step: ', step, 'loss: ',total_loss) # , 'result: ', result
 
+    if step != 0 and step % 1000 == 0:
+        saver.save(sess, './action_params')
+
 saver.save(sess, './action_params')  # meta_graph is not recommended, write_meta_graph=False
 
 
