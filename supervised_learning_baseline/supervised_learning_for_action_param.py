@@ -5,10 +5,10 @@ import pysc2.lib.actions as pysc2_actions
 
 LR = 0.0001
 
-minimap_placeholder = tf.placeholder(tf.float32, [None, 64, 64, 5])
-screen_placeholder = tf.placeholder(tf.float32, [None, 64, 64, 10])
-user_info_placeholder = tf.placeholder(tf.float32, [None, 11])
-action_placeholder = tf.placeholder(tf.float32, [None, 524]) # one hot
+minimap_placeholder = tf.placeholder(tf.float32, [None, 64, 64, 5], name="minimap_placeholder")
+screen_placeholder = tf.placeholder(tf.float32, [None, 64, 64, 10], name="screen_placeholder")
+user_info_placeholder = tf.placeholder(tf.float32, [None, 11], name="user_info_placeholder")
+action_placeholder = tf.placeholder(tf.float32, [None, 524], name="action_placeholder") # one hot
 
 # arg_placeholder will look like
 # [
@@ -97,21 +97,21 @@ concat_input = tf.concat([minimap_output, screen_output, action_output, user_inf
 ##### arg_type output loss
 # screen
 screen_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
-screen_output_pred = tf.layers.dense(screen_output_dense, 2)
+screen_output_pred = tf.layers.dense(screen_output_dense, 2, name='screen_output_pred')
 screen_output_loss = tf.reduce_mean(tf.square(screen_output_pred - arg_screen_replay_ouput))
 # minimap
 minimap_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
-minimap_output_pred = tf.layers.dense(minimap_output_dense, 2)
+minimap_output_pred = tf.layers.dense(minimap_output_dense, 2, name='minimap_output_loss')
 minimap_output_loss = tf.reduce_mean(tf.square(minimap_output_pred - arg_minimap_replay_ouput))
 # screen2
 screen2_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
-screen2_output_pred = tf.layers.dense(screen2_output_dense, 2)
+screen2_output_pred = tf.layers.dense(screen2_output_dense, 2, name='screen2_output_pred')
 screen2_output_loss = tf.reduce_mean(tf.square(screen2_output_pred - arg_screen2_replay_ouput))
 # queued
 queued_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 queued_output_logits = tf.layers.dense(queued_output_dense, 2) # enum, [False, True]
 queued_pred = tf.nn.softmax(queued_output_logits, name="queued_pred")
-queued_pred_cls = tf.argmax(queued_pred, dimension=1)
+queued_pred_cls = tf.argmax(queued_pred, dimension=1, name='queued_pred_cls')
 queued_cross_entropy = tf.losses.sparse_softmax_cross_entropy(labels=arg_queued_replay_output, 
     logits=queued_output_logits)
 queued_loss = tf.reduce_mean(queued_cross_entropy)
@@ -119,19 +119,20 @@ queued_loss = tf.reduce_mean(queued_cross_entropy)
 control_group_act_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 control_group_act_logits = tf.layers.dense(control_group_act_output_dense,5) #enum, 5 output, start with 0 
 control_group_act_pred = tf.nn.softmax(control_group_act_logits, name="control_group_act_pred")
-control_group_act_cls = tf.argmax(control_group_act_pred, dimension=1)
+control_group_act_cls = tf.argmax(control_group_act_pred, dimension=1, name='control_group_act_cls')
 control_group_act_cross_entropy = tf.losses.sparse_softmax_cross_entropy(labels=arg_control_group_act_replay_output, 
     logits=control_group_act_logits)
 control_group_act_loss = tf.reduce_mean(control_group_act_cross_entropy)
 # control_group_id
 control_group_id_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 control_group_id_output = tf.layers.dense(control_group_id_output_dense, 1)
-control_group_id_loss = tf.square(control_group_id_output - arg_control_group_id_output)
+rounded_control_group_id_output = tf.round(control_group_id_output, name="control_group_id_output")
+control_group_id_loss = tf.square(rounded_control_group_id_output - arg_control_group_id_output)
 # select_point_act
 select_point_act_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 select_point_act_logits = tf.layers.dense(select_point_act_dense, 4) # enum, 4 output
 select_point_act_pred = tf.nn.softmax(select_point_act_logits, name="select_point_act_pred")
-select_point_act_cls = tf.argmax(select_point_act_pred, dimension=1)
+select_point_act_cls = tf.argmax(select_point_act_pred, dimension=1, name='select_point_act_cls')
 select_point_act_cross_entropy = tf.losses.sparse_softmax_cross_entropy(labels=arg_select_point_act_output, 
     logits=select_point_act_logits)
 select_point_act_loss = tf.reduce_mean(select_point_act_cross_entropy)
@@ -139,7 +140,7 @@ select_point_act_loss = tf.reduce_mean(select_point_act_cross_entropy)
 select_add_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 select_add_output_logits = tf.layers.dense(select_add_output_dense, 2) # enum, [False, True]
 select_add_pred = tf.nn.softmax(select_add_output_logits, name="select_add_pred")
-select_add_pred_cls = tf.argmax(select_add_pred, dimension=1)
+select_add_pred_cls = tf.argmax(select_add_pred, dimension=1, name='select_add_pred_cls')
 select_add_cross_entropy = tf.losses.sparse_softmax_cross_entropy(labels=arg_select_add_output, 
     logits=select_add_output_logits)
 select_add_loss = tf.reduce_mean(select_add_cross_entropy)
@@ -147,30 +148,33 @@ select_add_loss = tf.reduce_mean(select_add_cross_entropy)
 select_unit_act_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 select_unit_act_logits = tf.layers.dense(select_unit_act_dense, 4) # enum, 4 output
 select_unit_act_pred = tf.nn.softmax(select_unit_act_logits, name="select_unit_act_pred")
-select_unit_act_cls = tf.argmax(select_unit_act_pred, dimension=1)
+select_unit_act_cls = tf.argmax(select_unit_act_pred, dimension=1, name='select_unit_act_cls')
 select_unit_act_cross_entropy = tf.losses.sparse_softmax_cross_entropy(labels=arg_select_unit_act_output, 
     logits=select_unit_act_logits)
 select_unit_act_loss = tf.reduce_mean(select_unit_act_cross_entropy)
 # select_unit_id
 select_unit_id_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 select_unit_id_output = tf.layers.dense(select_unit_id_output_dense, 1)
-select_unit_id_loss = tf.square(select_unit_id_output - arg_select_unit_id_output)
+rounded_select_unit_id_output = tf.round(select_unit_id_output, name="select_unit_id_output")
+select_unit_id_loss = tf.square(rounded_select_unit_id_output - arg_select_unit_id_output)
 # select_worker
 select_worker_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 select_worker_logits = tf.layers.dense(select_worker_dense, 4) # enum, 4 output
 select_worker_pred = tf.nn.softmax(select_worker_logits, name="select_worker_pred")
-select_worker_cls = tf.argmax(select_worker_pred, dimension=1)
+select_worker_cls = tf.argmax(select_worker_pred, dimension=1, name='select_worker_cls')
 select_worker_cross_entropy = tf.losses.sparse_softmax_cross_entropy(labels=arg_select_worker_output, 
     logits=select_worker_logits)
 select_worker_loss = tf.reduce_mean(select_worker_cross_entropy)
 # build_queue_id
 build_queue_id_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 build_queue_id_output = tf.layers.dense(build_queue_id_output_dense, 1)
-build_queue_id_loss = tf.square(build_queue_id_output - arg_build_queue_id_output)
+rounded_build_queue_id_output = tf.round(build_queue_id_output, name="build_queue_id_output")
+build_queue_id_loss = tf.square(rounded_build_queue_id_output - arg_build_queue_id_output)
 # unload_id
 unload_id_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 unload_id_output = tf.layers.dense(unload_id_output_dense, 1)
-unload_id_loss = tf.square(unload_id_output - arg_unload_id_output)
+rounded_unload_id_output = tf.round(unload_id_output, name="unload_id_output")
+unload_id_loss = tf.square(rounded_unload_id_output - arg_unload_id_output)
 
 ####### Function types for output
 Function_type_losses = {
