@@ -101,7 +101,7 @@ screen_output_pred = tf.layers.dense(screen_output_dense, 2, name='screen_output
 screen_output_loss = tf.reduce_mean(tf.square(screen_output_pred - arg_screen_replay_ouput))
 # minimap
 minimap_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
-minimap_output_pred = tf.layers.dense(minimap_output_dense, 2, name='minimap_output_loss')
+minimap_output_pred = tf.layers.dense(minimap_output_dense, 2, name='minimap_output_pred')
 minimap_output_loss = tf.reduce_mean(tf.square(minimap_output_pred - arg_minimap_replay_ouput))
 # screen2
 screen2_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
