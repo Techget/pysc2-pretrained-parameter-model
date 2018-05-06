@@ -127,7 +127,7 @@ control_group_act_loss = tf.reduce_mean(control_group_act_cross_entropy)
 control_group_id_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 control_group_id_output = tf.layers.dense(control_group_id_output_dense, 1)
 rounded_control_group_id_output = tf.round(control_group_id_output, name="control_group_id_output")
-control_group_id_loss = tf.square(rounded_control_group_id_output - arg_control_group_id_output)
+control_group_id_loss = tf.square(control_group_id_output - arg_control_group_id_output)
 # select_point_act
 select_point_act_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 select_point_act_logits = tf.layers.dense(select_point_act_dense, 4) # enum, 4 output
@@ -155,8 +155,8 @@ select_unit_act_loss = tf.reduce_mean(select_unit_act_cross_entropy)
 # select_unit_id
 select_unit_id_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 select_unit_id_output = tf.layers.dense(select_unit_id_output_dense, 1)
-rounded_select_unit_id_output = tf.round(select_unit_id_output, name="select_unit_id_output")
-select_unit_id_loss = tf.square(rounded_select_unit_id_output - arg_select_unit_id_output)
+rounded_select_unit_id_output = tf.round(select_unit_id_output, name="select_unit_id_output") # round cannot be used for gradient update
+select_unit_id_loss = tf.square(select_unit_id_output - arg_select_unit_id_output)
 # select_worker
 select_worker_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 select_worker_logits = tf.layers.dense(select_worker_dense, 4) # enum, 4 output
@@ -169,12 +169,12 @@ select_worker_loss = tf.reduce_mean(select_worker_cross_entropy)
 build_queue_id_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 build_queue_id_output = tf.layers.dense(build_queue_id_output_dense, 1)
 rounded_build_queue_id_output = tf.round(build_queue_id_output, name="build_queue_id_output")
-build_queue_id_loss = tf.square(rounded_build_queue_id_output - arg_build_queue_id_output)
+build_queue_id_loss = tf.square(build_queue_id_output - arg_build_queue_id_output)
 # unload_id
 unload_id_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 unload_id_output = tf.layers.dense(unload_id_output_dense, 1)
 rounded_unload_id_output = tf.round(unload_id_output, name="unload_id_output")
-unload_id_loss = tf.square(rounded_unload_id_output - arg_unload_id_output)
+unload_id_loss = tf.square(unload_id_output - arg_unload_id_output)
 
 ####### Function types for output
 Function_type_losses = {
