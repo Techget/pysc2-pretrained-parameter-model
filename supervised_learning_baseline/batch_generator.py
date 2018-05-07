@@ -10,7 +10,9 @@ import pysc2.lib.actions as pysc2_actions
 class batchGenerator(object):
 	def __init__(self):
 		self.home_dir = expanduser("~")
-		self.parsed_directory = self.home_dir+'/pysc2-replay/data_full/' 
+		# self.parsed_directory = self.home_dir+'/pysc2-replay/data_full/'
+		self.parsed_directory = self.home_dir+'/pysc2-replay/map_race_data/Ascension to Aiur LE_Terran_Terran/'
+
 		self.parsed_filenames = os.listdir(self.parsed_directory)
 		self.next_index = 0
 		
@@ -25,7 +27,7 @@ class batchGenerator(object):
 		self.reserve_validation_file()
 
 
-	# reserve one file as validation data set, also warm up the validation 
+	# reserve one file as validation data set, also warm up the data generator 
 	def reserve_validation_file(self):
 		FIND_FLAG = False
 
@@ -69,7 +71,6 @@ class batchGenerator(object):
 			# 	info_dict['playerInfo'][0]['playerInfo']['raceActual'] == self.player1_used_race and \
 			# 	info_dict['playerInfo'][1]['playerInfo']['raceActual'] == self.player2_used_race and \
 			if winner_id != -1 and CONTAIN_FLAG == True:
-
 				del self.parsed_filenames[self.next_index - 1] # remove from training data set
 				self.validation_file_name = full_filename
 				self.validation_winner_id = winner_id
