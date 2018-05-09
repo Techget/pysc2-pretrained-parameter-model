@@ -129,7 +129,7 @@ control_group_act_loss = tf.reduce_mean(control_group_act_cross_entropy)
 # control_group_id
 control_group_id_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
 control_group_id_output = tf.layers.dense(control_group_id_output_dense, 1)
-control_group_id_output = tf.clip_by_value(control_group_id, 0, 10)
+control_group_id_output = tf.clip_by_value(control_group_id_output, 0, 10)
 rounded_control_group_id_output = tf.round(control_group_id_output, name="control_group_id_output")
 control_group_id_loss = tf.square(control_group_id_output - arg_control_group_id_output)
 # select_point_act
