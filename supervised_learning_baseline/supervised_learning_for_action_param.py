@@ -97,15 +97,18 @@ concat_input = tf.concat([minimap_output, screen_output, action_output, user_inf
 ##### arg_type output loss
 # screen
 screen_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
-screen_output_pred = tf.layers.dense(screen_output_dense, 2, name='screen_output_pred')
+screen_output_pred = tf.layers.dense(screen_output_dense, 2)
+screen_param_prediction = tf.identity(screen_output_pred, 'screen_param_prediction')
 screen_output_loss = tf.reduce_mean(tf.square(screen_output_pred - arg_screen_replay_ouput))
 # minimap
 minimap_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
-minimap_output_pred = tf.layers.dense(minimap_output_dense, 2, name='minimap_output_pred')
+minimap_output_pred = tf.layers.dense(minimap_output_dense, 2)
+minimap_param_prediction = tf.identity(minimap_output_pred, 'minimap_param_prediction')
 minimap_output_loss = tf.reduce_mean(tf.square(minimap_output_pred - arg_minimap_replay_ouput))
 # screen2
 screen2_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
-screen2_output_pred = tf.layers.dense(screen2_output_dense, 2, name='screen2_output_pred')
+screen2_output_pred = tf.layers.dense(screen2_output_dense, 2)
+screen2_param_prediction = tf.identity(screen2_output_pred, 'screen2_param_prediction')
 screen2_output_loss = tf.reduce_mean(tf.square(screen2_output_pred - arg_screen2_replay_ouput))
 # queued
 queued_output_dense = tf.layers.dense(concat_input, 16, tf.nn.relu)
@@ -436,10 +439,10 @@ for step in range(5000):                             # train
         # writer.add_summary(total_loss, step)
         print('step: ', step, 'loss: ',total_loss) # , 'result: ', result
 
-    if step != 0 and step % 1000 == 0:
-        saver.save(sess, './action_params')
+    if (step != 0 and step % 1000 == 0) or step == 50:
+        saver.save(sess, './param_pred_model/action_params')
 
-saver.save(sess, './action_params')  # meta_graph is not recommended, write_meta_graph=False
+saver.save(sess, './param_pred_model/action_params')  # meta_graph is not recommended, write_meta_graph=False
 
 
 
